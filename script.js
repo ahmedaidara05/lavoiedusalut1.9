@@ -1,247 +1,184 @@
-document.addEventListener('DOMContentLoaded', () => {
-    // Sécurité
-    document.addEventListener('contextmenu', e => e.preventDefault());
-    document.addEventListener('copy', e => e.preventDefault());
-    document.addEventListener('cut', e => e.preventDefault());
-    document.addEventListener('dragstart', e => e.preventDefault());
-    document.addEventListener('keydown', e => {
-        if (e.ctrlKey && (e.key === 'p' || e.key === 's' || e.key === 'c')) {
-            e.preventDefault();
-        }
+const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_AUTH_DOMAIN",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_STORAGE_BUCKET",
+    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+    appId: "YOUR_APP_ID"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const auth = firebase.auth();
+
+let voices = [];
+let currentUtterance = null;
+let isSpeaking = false;
+
+function updateNavbarVisibility() {
+    const homeSection = document.querySelector('#home');
+    const topNavbar = document.querySelector('.top-navbar');
+    const bottomNavbar = document.querySelector('.bottom-navbar');
+    
+    if (homeSection.classList.contains('active')) {
+        topNavbar.style.display = 'none';
+        bottomNavbar.style.display = 'none';
+    } else {
+        topNavbar.style.display = 'flex';
+        bottomNavbar.style.display = 'flex';
+    }
+}
+
+function showSection(sectionId) {
+    document.querySelectorAll('section').forEach(section => {
+        section.classList.remove('active');
     });
+    document.querySelector(sectionId).classList.add('active');
+    updateNavbarVisibility();
+    window.scrollTo(0, 0);
+}
 
-    // Variables globales
-    let currentChapter = null;
-    let currentLanguage = localStorage.getItem('language') || 'fr';
-    let fontSize = parseInt(localStorage.getItem('fontSize')) || 16;
-    let isDarkMode = localStorage.getItem('theme') === 'dark';
-    let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
-    let lastPage = 'home';
-    let isSpeaking = false;
-    let currentSpeech = null;
-    let autoScrollInterval = null;
+function toggleTheme() {
+    document.body.classList.toggle('dark-mode');
+    const themeIcon = document.querySelector('#theme-toggle .icon');
+    themeIcon.textContent = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
+    localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+}
 
-    // Chargement du contenu
-    fetch('content.json')
-        .then(response => response.json())
-        .then(data => {
-            chapters = data.chapters;
-            populateTOC();
-            updateFavorites();
-        });
-
-    // Navigation
-    window.navigateTo = function(page) {
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        document.getElementById(page).classList.add('active');
-        lastPage = page === 'settings' ? lastPage : page;
-        if (page.startsWith('chapter')) {
-            currentChapter = page;
-            loadChapter();
-        }
-    };
-
-    window.navigateBack = function() {
-        navigateTo(lastPage);
-    };
-
-    // Sommaire
-    function populateTOC() {
-        const chapterList = document.getElementById('chapter-list');
-        chapters.forEach((chapter, index) => {
-            const li = document.createElement('li');
-            li.innerHTML = `<a href="#" onclick="navigateTo('chapter${index + 1}')">${chapter.title[currentLanguage]}</a>`;
-            chapterList.appendChild(li);
-        });
-    }
-
-    // Lecture
-    function loadChapter() {
-        const chapterIndex = parseInt(currentChapter.replace('chapter', '')) - 1;
-        const chapter = chapters[chapterIndex];
-        document.getElementById('chapter-title').textContent = chapter.title[currentLanguage];
-        document.getElementById('chapter-content').innerHTML = chapter.content[currentLanguage];
-        document.getElementById('favorite-toggle').innerHTML = favorites.includes(currentChapter) ? '<i class="fas fa-heart"></i>' : '<i class="far fa-heart"></i>';
-        updateFontSize();
-        updateLanguage();
-    }
-
-    // Mode sombre
-    const themeToggle = document.getElementById('theme-toggle');
-    const settingsTheme = document.getElementById('settings-theme');
-    if (isDarkMode) {
-        document.body.classList.add('light');
-        themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
-        settingsTheme.checked = true;
-    }
-    themeToggle.addEventListener('click', toggleTheme);
-    settingsTheme.addEventListener('change', toggleTheme);
-
-    function toggleTheme() {
-        isDarkMode = !isDarkMode;
-        document.body.classList.toggle('light', isDarkMode);
-        themeToggle.innerHTML = isDarkMode ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
-        settingsTheme.checked = isDarkMode;
-        localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
-    }
-
-    // Langue
-    const languageSelect = document.getElementById('language-select');
-    const settingsLanguage = document.getElementById('settings-language');
-    languageSelect.value = currentLanguage;
-    settingsLanguage.value = currentLanguage;
-    languageSelect.addEventListener('change', () => {
-        currentLanguage = languageSelect.value;
-        settingsLanguage.value = currentLanguage;
-        updateLanguage();
-    });
-    settingsLanguage.addEventListener('change', () => {
-        currentLanguage = settingsLanguage.value;
-        languageSelect.value = currentLanguage;
-        updateLanguage();
-    });
-
-    function updateLanguage() {
-        localStorage.setItem('language', currentLanguage);
-        if (currentChapter) loadChapter();
-        populateTOC();
-        updateFavorites();
-    }
-
-    // Zoom
-    const fontSizeInput = document.getElementById('font-size');
-    const settingsFontSize = document.getElementById('settings-font-size');
-    const fontSizeValue = document.getElementById('font-size-value');
-    fontSizeInput.value = fontSize;
-    settingsFontSize.value = fontSize;
-    fontSizeValue.textContent = `${fontSize}px`;
-    fontSizeInput.addEventListener('input', () => {
-        fontSize = parseInt(fontSizeInput.value);
-        settingsFontSize.value = fontSize;
-        fontSizeValue.textContent = `${fontSize}px`;
-        updateFontSize();
-        localStorage.setItem('fontSize', fontSize);
-    });
-    settingsFontSize.addEventListener('input', () => {
-        fontSize = parseInt(settingsFontSize.value);
-        fontSizeInput.value = fontSize;
-        fontSizeValue.textContent = `${fontSize}px`;
-        updateFontSize();
-        localStorage.setItem('fontSize', fontSize);
-    });
-
-    function updateFontSize() {
-        document.getElementById('chapter-content').style.fontSize = `${fontSize}px`;
-    }
-
-    // Lecture vocale
+function loadVoices() {
+    voices = speechSynthesis.getVoices();
     const voiceSelect = document.getElementById('voice-select');
-    const voiceToggle = document.getElementById('voice-toggle');
-    let voices = [];
-    function populateVoices() {
-        voices = speechSynthesis.getVoices();
-        voiceSelect.innerHTML = '';
-        const availableVoices = voices.filter(v => ['fr-FR', 'en-US', 'ar-SA'].includes(v.lang)).slice(0, 4);
-        availableVoices.forEach((voice, index) => {
-            const option = document.createElement('option');
-            option.value = index;
-            option.textContent = `${voice.name} (${voice.lang})`;
-            voiceSelect.appendChild(option);
-        });
-    }
-    speechSynthesis.onvoiceschanged = populateVoices;
-    populateVoices();
+    voiceSelect.innerHTML = '';
+    voices.forEach((voice, index) => {
+        const option = document.createElement('option');
+        option.value = index;
+        option.textContent = `${voice.name} (${voice.lang})`;
+        voiceSelect.appendChild(option);
+    });
+}
 
-    voiceToggle.addEventListener('click', () => {
-        if (isSpeaking) {
-            speechSynthesis.cancel();
+function toggleVoice() {
+    const voiceButton = document.getElementById('voice-toggle');
+    const voiceSelect = document.getElementById('voice-select');
+    
+    if (!isSpeaking) {
+        const selectedVoiceIndex = voiceSelect.value;
+        const textToRead = document.querySelector('section.active .content[data-lang="fr"]').textContent;
+        
+        currentUtterance = new SpeechSynthesisUtterance(textToRead);
+        currentUtterance.voice = voices[selectedVoiceIndex];
+        currentUtterance.lang = 'fr-FR';
+        currentUtterance.onend = () => {
             isSpeaking = false;
-            voiceToggle.innerHTML = '<i class="fas fa-volume-up"></i>';
-        } else {
-            const text = document.getElementById('chapter-content').textContent;
-            currentSpeech = new SpeechSynthesisUtterance(text);
-            currentSpeech.voice = voices[parseInt(voiceSelect.value)];
-            currentSpeech.lang = currentLanguage;
-            speechSynthesis.speak(currentSpeech);
-            isSpeaking = true;
-            voiceToggle.innerHTML = '<i class="fas fa-pause"></i>';
-        }
-    });
+            voiceButton.querySelector('.icon').textContent = '🔊';
+        };
+        
+        speechSynthesis.speak(currentUtterance);
+        isSpeaking = true;
+        voiceButton.querySelector('.icon').textContent = '⏸';
+    } else {
+        speechSynthesis.cancel();
+        isSpeaking = false;
+        voiceButton.querySelector('.icon').textContent = '🔊';
+    }
+}
 
-    // Défilement automatique
-    const autoScroll = document.getElementById('auto-scroll');
-    autoScroll.addEventListener('click', () => {
-        if (autoScrollInterval) {
-            clearInterval(autoScrollInterval);
-            autoScrollInterval = null;
-            autoScroll.innerHTML = '<i class="fas fa-arrows-alt-v"></i>';
-        } else {
-            let direction = 1;
-            autoScrollInterval = setInterval(() => {
-                window.scrollBy(0, direction * 2);
-                if (window.scrollY >= document.body.scrollHeight - window.innerHeight || window.scrollY <= 0) {
-                    direction *= -1;
-                }
-            }, 50);
-            autoScroll.innerHTML = '<i class="fas fa-pause"></i>';
-        }
+function toggleLanguage() {
+    const currentLang = document.querySelector('.content:not([style*="display: none"])').dataset.lang;
+    const nextLang = currentLang === 'fr' ? 'en' : currentLang === 'en' ? 'ar' : 'fr';
+    
+    document.querySelectorAll('.content').forEach(content => {
+        content.style.display = content.dataset.lang === nextLang ? 'block' : 'none';
     });
+}
 
-    // Favoris
-    const favoriteToggle = document.getElementById('favorite-toggle');
-    favoriteToggle.addEventListener('click', () => {
-        if (favorites.includes(currentChapter)) {
-            favorites = favorites.filter(f => f !== currentChapter);
-            favoriteToggle.innerHTML = '<i class="far fa-heart"></i>';
+function toggleFavorite(chapterId) {
+    const favoriteIcon = document.querySelector(`.favorite[data-chapter="${chapterId}"]`);
+    const user = auth.currentUser;
+    
+    if (user) {
+        const favoriteRef = db.collection('users').doc(user.uid).collection('favorites').doc(chapterId);
+        favoriteIcon.classList.toggle('active');
+        
+        if (favoriteIcon.classList.contains('active')) {
+            favoriteRef.set({ timestamp: firebase.firestore.FieldValue.serverTimestamp() });
         } else {
-            favorites.push(currentChapter);
-            favoriteToggle.innerHTML = '<i class="fas fa-heart"></i>';
+            favoriteRef.delete();
         }
-        localStorage.setItem('favorites', JSON.stringify(favorites));
-        updateFavorites();
-    });
+    } else {
+        alert('Veuillez vous connecter pour ajouter des favoris.');
+    }
+}
 
-    function updateFavorites() {
-        const favoritesList = document.getElementById('favorites-list');
-        favoritesList.innerHTML = '';
-        favorites.forEach(chapter => {
-            const chapterIndex = parseInt(chapter.replace('chapter', '')) - 1;
-            const li = document.createElement('li');
-            li.innerHTML = `<a href="#" onclick="navigateTo('${chapter}')">${chapters[chapterIndex].title[currentLanguage]}</a>`;
-            favoritesList.appendChild(li);
+function loadFavorites() {
+    const user = auth.currentUser;
+    if (user) {
+        db.collection('users').doc(user.uid).collection('favorites').get().then(snapshot => {
+            snapshot.forEach(doc => {
+                const chapterId = doc.id;
+                const favoriteIcon = document.querySelector(`.favorite[data-chapter="${chapterId}"]`);
+                if (favoriteIcon) favoriteIcon.classList.add('active');
+            });
         });
     }
+}
 
-    // Authentification (simulée)
-    const loginForm = document.getElementById('login-form');
-    const signupForm = document.getElementById('signup-form');
-    const signOut = document.getElementById('sign-out');
-    const authForms = document.getElementById('auth-forms');
-    const userInfo = document.getElementById('user-info');
-    const userName = document.getElementById('user-name');
-    const userPhoto = document.getElementById('user-photo');
-    const authError = document.getElementById('auth-error');
+function navigateChapters() {
+    document.querySelectorAll('.prev-btn, .next-btn').forEach(button => {
+        button.addEventListener('click', () => {
+            const currentSection = document.querySelector('section.active');
+            const allSections = Array.from(document.querySelectorAll('section.chapter'));
+            const currentIndex = allSections.indexOf(currentSection);
+            
+            if (button.classList.contains('prev-btn') && currentIndex > 0) {
+                showSection(`#${allSections[currentIndex - 1].id}`);
+            } else if (button.classList.contains('next-btn') && currentIndex < allSections.length - 1) {
+                showSection(`#${allSections[currentIndex + 1].id}`);
+            }
+            
+            const prevBtn = currentSection.querySelector('.prev-btn');
+            const nextBtn = currentSection.querySelector('.next-btn');
+            if (prevBtn) prevBtn.disabled = currentIndex === 0;
+            if (nextBtn) nextBtn.disabled = currentIndex === allSections.length - 1;
+        });
+    });
+}
 
-    loginForm.addEventListener('submit', e => {
-        e.preventDefault();
-        authForms.style.display = 'none';
-        userInfo.style.display = 'block';
-        userName.textContent = document.getElementById('login-email').value.split('@')[0];
-        userPhoto.src = 'default-user.png';
+document.addEventListener('DOMContentLoaded', () => {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+        document.body.classList.add('dark-mode');
+        document.querySelector('#theme-toggle .icon').textContent = '☀️';
+    }
+
+    document.querySelectorAll('.close-btn').forEach(button => {
+        button.addEventListener('click', () => showSection('#home'));
     });
 
-    signupForm.addEventListener('submit', e => {
-        e.preventDefault();
-        authForms.style.display = 'none';
-        userInfo.style.display = 'block';
-        userName.textContent = document.getElementById('signup-name').value;
-        userPhoto.src = 'default-user.png';
+    document.querySelectorAll('#chapter-list a').forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            showSection(link.getAttribute('href'));
+        });
     });
 
-    signOut.addEventListener('click', () => {
-        authForms.style.display = 'block';
-        userInfo.style.display = 'none';
-        userName.textContent = 'Invité';
-        userPhoto.src = 'default-user.png';
+    document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
+    document.getElementById('voice-toggle').addEventListener('click', toggleVoice);
+    document.getElementById('language-toggle').addEventListener('click', toggleLanguage);
+
+    speechSynthesis.onvoiceschanged = loadVoices;
+    loadVoices();
+
+    document.querySelectorAll('.favorite').forEach(favorite => {
+        favorite.addEventListener('click', () => toggleFavorite(favorite.dataset.chapter));
     });
+
+    auth.onAuthStateChanged(user => {
+        if (user) {
+            loadFavorites();
+        }
+    });
+
+    navigateChapters();
+    updateNavbarVisibility();
 });
