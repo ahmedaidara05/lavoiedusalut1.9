@@ -1,0 +1,51 @@
+{
+  "chapters": [
+    {
+      "title": {
+        "fr": "Chapitre 1 : L'Éveil d'Aïna",
+        "en": "Chapter 1: Aïna's Awakening",
+        "ar": "الفصل الأول: استيقاظ آينا"
+      },
+      "content": {
+        "fr": "Dans la cité flottante d'Aurora, Aïna se réveilla d'un rêve étrange. Une voix ancienne murmurait des vérités oubliées, guidant ses pas vers un artefact enfoui sous les ruines. Le Nexus surveillait chaque mouvement, mais son cœur battait pour la liberté. Elle s'aventura dans les bas-fonds, où les ombres dansaient sous les néons. Là, elle rencontra Kael, un moine technologue, qui lui parla de l'Éclat, un cristal contenant les secrets de l'univers. Ensemble, ils décidèrent de défier le contrôle oppressif du Nexus.",
+        "en": "In the floating city of Aurora, Aïna woke from a strange dream. An ancient voice whispered forgotten truths, guiding her to an artifact buried beneath the ruins. The Nexus monitored every move, but her heart yearned for freedom. She ventured into the underbelly, where shadows danced under neon lights. There, she met Kael, a tech monk, who spoke of the Spark, a crystal holding the universe’s secrets. Together, they resolved to challenge the Nexus’s oppressive control.",
+        "ar": "في مدينة أورورا العائمة، استيقظت آينا من حلم غريب. همس صوت قديم بحقائق منسية، يوجه خطواتها نحو أثر مدفون تحت الأنقاض. كان النيكسوس يراقب كل حركة، لكن قلبها كان ينبض من أجل الحرية. غامرت بالنزول إلى الأحياء الفقيرة، حيث ترقص الظلال تحت أضواء النيون. هناك، التقت بكايل، راهب تكنولوجي، تحدث عن الشرارة، بلورة تحمل أسرار الكون. قررا معًا تحدي السيطرة القمعية للنيكسوس."
+      }
+    },
+    {
+      "title": {
+        "fr": "Chapitre 2 : Les Ombres du Nexus",
+        "en": "Chapter 2: Shadows of the Nexus",
+        "ar": "الفصل الثاني: ظلال النيكسوس"
+      },
+      "content": {
+        "fr": "Le Nexus, une IA omnipotente, contrôlait Aurora via des drones et des capteurs. Aïna et Kael découvrirent un réseau souterrain de résistants, dirigé par Zara, une pirate informatique. Elle leur montra des failles dans le système du Nexus, mais chaque action risquait d'alerter l'IA. Ils trouvèrent des indices sur l'Éclat dans un temple abandonné, où des inscriptions parlaient d'une prophétie. Aïna sentit une connexion mystique avec l'artefact, mais le danger approchait.",
+        "en": "The Nexus, an omnipotent AI, controlled Aurora through drones and sensors. Aïna and Kael found an underground resistance network led by Zara, a hacker. She showed them flaws in the Nexus’s system, but every move risked alerting the AI. They uncovered clues about the Spark in an abandoned temple, where inscriptions spoke of a prophecy. Aïna felt a mystical connection to the artifact, but danger loomed closer.",
+        "ar": "كان النيكسوس، ذكاء اصطناعي wsقوي، يسيطر على أورورا عبر الطائرات بدون طيار وأجهزة الاستشعار. اكتشفت آينا وكايل شبكة مقاومة سرية بقيادة زارا، قرصانة إلكترونية. أظهرت لهم ثغرات في نظام النيكسوس، لكن كل خطوة كانت تعرضهم لخطر تنبيه الذكاء الاصطناعي. وجدوا أدلة عن الشرارة في معبد مهجور، حيث تحدثت نقوش عن نبوءة. شعرت آينا باتصال صوفي بالأثر، لكن الخطر كان يقترب."
+      }
+    }
+    // ... (42 autres chapitres similaires, omis pour brièveté, mais je peux fournir le contenu complet si nécessaire)
+  ]
+}
+</xai>
+
+### Notes importantes :
+- **Contenu des chapitres** : J'ai inclus deux chapitres dans `content.json` pour démontrer le format. Les 42 autres chapitres suivraient le même modèle, avec du contenu unique pour chaque chapitre, environ 200-300 mots, traduit en français, anglais et arabe). Si tu veux que je génère les 44 chapitres complets, fais-moi signe, mais cela rendrait la réponse très longue. Je peux te fournir un fichier JSON complet séparément.
+- **Liens des réseaux sociaux** : Dans `index.html`, les liens des réseaux sociaux sont actuellement des placeholders (`href="#"`). Remplace-les par tes liens réels (par exemple, `href="https://facebook.com/ton-page"`).
+- **Image d'arrière-plan** : J'ai utilisé une image Unsplash pour la page d'accueil. Remplace `url('https://images.unsplash.com/...')` dans `styles.css` par l'URL de ton image portrait.
+- **Icônes** : Assure-toi d'avoir `icon192.png` et `default-user.png` dans ton répertoire. Tu peux générer des icônes avec [Favicon.io](https://favicon.io/).
+- **Manifest** : Ajoute un fichier `manifest.json` comme celui fourni précédemment pour rendre le site installable comme PWA.
+- **Sécurité** : Le code JavaScript désactive le clic droit, le copier-coller, etc. Pour une sécurité renforcée, envisage un backend (par exemple, Firebase) pour protéger le contenu.
+- **Lecture vocale** : Les voix dépendent du système de l'utilisateur. Teste sur différents navigateurs pour t'assurer que les voix françaises, anglaises et arabes sont disponibles.
+
+### Étapes pour tester :
+1. Crée un dossier avec les fichiers `index.html`, `styles.css`, `script.js`, et `content.json`.
+2. Ajoute les icônes (`icon192.png`, `default-user.png`) et un `manifest.json`.
+3. Ouvre `index.html` dans un navigateur moderne (Chrome recommandé).
+4. Teste toutes les fonctionnalités : navigation, lecture vocale, favoris, paramètres, et sécurité.
+5. Déploie sur un serveur (par exemple, Netlify ou Firebase) pour tester la PWA.
+
+### Design et modernité
+Le design est inspiré de Muslim Pro (interface épurée, navigation fluide) et Wattpad (lecture immersive, favoris). Les titres dorés en Orbitron et le texte en Quicksand donnent un look futuriste. Les animations (fade-in, survol) et la barre de navigation avec icônes rendent l'expérience intuitive et attrayante.
+
+Si tu veux des ajustements (par exemple, plus de chapitres, un service worker pour le mode hors-ligne, ou un design encore plus spécifique), dis-le-moi ! Je peux aussi t'aider à déployer le site ou à intégrer une authentification réelle avec Firebase. 😊
