@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Découvrez 'L'Éclat des Étoiles', une expérience de lecture immersive avec mode sombre, lecture vocale, et plus encore.">
+    <meta name="theme-color" content="#121212">
+    <title>L'Éclat des Étoiles</title>
+    <link rel="icon" href="icon192.png" type="image/png">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="manifest" href="manifest.json">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <!-- Page d'accueil -->
+    <section id="home" class="page active">
+        <div class="hero">
+            <div class="hero-overlay"></div>
+            <div class="hero-content">
+                <h1>L'Éclat des Étoiles</h1>
+                <p class="author">Par Nova Écrivain</p>
+                <p class="description">
+                    Plongez dans une épopée futuriste où Aïna défie le Nexus pour restaurer l'espoir de l'humanité. Une aventure spirituelle à travers des cités stellaires, mêlant foi, courage, et vérité.
+                </p>
+                <button class="start-btn" onclick="navigateTo('toc')">Commencer</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sommaire -->
+    <section id="toc" class="page">
+        <div class="container">
+            <h2>Sommaire</h2>
+            <ul id="chapter-list">
+                <!-- Généré dynamiquement via JS -->
+            </ul>
+        </div>
+    </section>
+
+    <!-- Lecture -->
+    <section id="reader" class="page">
+        <div class="reader-header">
+            <h2 id="chapter-title"></h2>
+            <div class="reader-controls">
+                <button id="theme-toggle" title="Mode sombre/clair"><i class="fas fa-moon"></i></button>
+                <select id="language-select">
+                    <option value="fr">Français</option>
+                    <option value="en">English</option>
+                    <option value="ar">العربية</option>
+                </select>
+                <input type="range" id="font-size" min="12" max="24" value="16">
+                <select id="voice-select" title="Choisir une voix"></select>
+                <button id="voice-toggle" title="Lecture vocale"><i class="fas fa-volume-up"></i></button>
+                <button id="auto-scroll" title="Défilement automatique"><i class="fas fa-arrows-alt-v"></i></button>
+                <button id="favorite-toggle" title="Ajouter aux favoris"><i class="far fa-heart"></i></button>
+            </div>
+        </div>
+        <div class="reader-content" id="chapter-content">
+            <!-- Contenu chargé dynamiquement -->
+        </div>
+    </section>
+
+    <!-- Favoris -->
+    <section id="favorites" class="page">
+        <div class="container">
+            <h2>Favoris</h2>
+            <ul id="favorites-list">
+                <!-- Généré dynamiquement via JS -->
+            </ul>
+        </div>
+    </section>
+
+    <!-- Paramètres -->
+    <section id="settings" class="page">
+        <button class="back-btn" onclick="navigateBack()"><i class="fas fa-arrow-left"></i></button>
+        <div class="container">
+            <div class="user-profile">
+                <img id="user-photo" src="default-user.png" alt="Photo de profil">
+                <h3 id="user-name">Invité</h3>
+            </div>
+            <div class="auth-section">
+                <h3>Compte</h3>
+                <div id="auth-forms">
+                    <form id="login-form">
+                        <input type="email" id="login-email" placeholder="E-mail" required>
+                        <input type="password" id="login-password" placeholder="Mot de passe" required>
+                        <button type="submit">Se connecter</button>
+                    </form>
+                    <form id="signup-form">
+                        <input type="text" id="signup-name" placeholder="Nom" required>
+                        <input type="email" id="signup-email" placeholder="E-mail" required>
+                        <input type="password" id="signup-password" placeholder="Mot de passe" required>
+                        <button type="submit">S'inscrire</button>
+                    </form>
+                    <p id="auth-error"></p>
+                </div>
+                <div id="user-info" style="display: none;">
+                    <button id="sign-out">Déconnexion</button>
+                </div>
+            </div>
+            <div class="settings-section">
+                <h3>Paramètres</h3>
+                <div class="setting">
+                    <label>Langue :</label>
+                    <select id="settings-language">
+                        <option value="fr">Français</option>
+                        <option value="en">English</option>
+                        <option value="ar">العربية</option>
+                    </select>
+                </div>
+                <div class="setting">
+                    <label>Mode sombre :</label>
+                    <input type="checkbox" id="settings-theme">
+                </div>
+                <div class="setting">
+                    <label>Taille du texte :</label>
+                    <input type="range" id="settings-font-size" min="12" max="24" value="16">
+                    <span id="font-size-value">16px</span>
+                </div>
+            </div>
+            <div class="about-section">
+                <h3>À propos</h3>
+                <p>Rejoignez-nous sur les réseaux sociaux :</p>
+                <div class="social-links">
+                    <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Barre de navigation inférieure -->
+    <nav class="bottom-nav">
+        <button onclick="navigateTo('home')" title="Accueil"><i class="fas fa-home"></i></button>
+        <button onclick="navigateTo('toc')" title="Sommaire"><i class="fas fa-list"></i></button>
+        <button onclick="navigateTo('favorites')" title="Favoris"><i class="fas fa-star"></i></button>
+        <button onclick="navigateTo('settings')" title="Paramètres"><i class="fas fa-cog"></i></button>
+    </nav>
+
+    <script src="script.js"></script>
+</body>
+</html>
