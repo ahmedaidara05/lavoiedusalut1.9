@@ -1,184 +1,155 @@
-const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_AUTH_DOMAIN",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_STORAGE_BUCKET",
-    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-    appId: "YOUR_APP_ID"
-};
-
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-const auth = firebase.auth();
-
-let voices = [];
-let currentUtterance = null;
-let isSpeaking = false;
-
-function updateNavbarVisibility() {
-    const homeSection = document.querySelector('#home');
-    const topNavbar = document.querySelector('.top-navbar');
-    const bottomNavbar = document.querySelector('.bottom-navbar');
-    
-    if (homeSection.classList.contains('active')) {
-        topNavbar.style.display = 'none';
-        bottomNavbar.style.display = 'none';
-    } else {
-        topNavbar.style.display = 'flex';
-        bottomNavbar.style.display = 'flex';
-    }
-}
-
-function showSection(sectionId) {
-    document.querySelectorAll('section').forEach(section => {
-        section.classList.remove('active');
-    });
-    document.querySelector(sectionId).classList.add('active');
-    updateNavbarVisibility();
-    window.scrollTo(0, 0);
-}
-
-function toggleTheme() {
-    document.body.classList.toggle('dark-mode');
-    const themeIcon = document.querySelector('#theme-toggle .icon');
-    themeIcon.textContent = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
-    localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
-}
-
-function loadVoices() {
-    voices = speechSynthesis.getVoices();
-    const voiceSelect = document.getElementById('voice-select');
-    voiceSelect.innerHTML = '';
-    voices.forEach((voice, index) => {
-        const option = document.createElement('option');
-        option.value = index;
-        option.textContent = `${voice.name} (${voice.lang})`;
-        voiceSelect.appendChild(option);
-    });
-}
-
-function toggleVoice() {
-    const voiceButton = document.getElementById('voice-toggle');
-    const voiceSelect = document.getElementById('voice-select');
-    
-    if (!isSpeaking) {
-        const selectedVoiceIndex = voiceSelect.value;
-        const textToRead = document.querySelector('section.active .content[data-lang="fr"]').textContent;
-        
-        currentUtterance = new SpeechSynthesisUtterance(textToRead);
-        currentUtterance.voice = voices[selectedVoiceIndex];
-        currentUtterance.lang = 'fr-FR';
-        currentUtterance.onend = () => {
-            isSpeaking = false;
-            voiceButton.querySelector('.icon').textContent = '🔊';
-        };
-        
-        speechSynthesis.speak(currentUtterance);
-        isSpeaking = true;
-        voiceButton.querySelector('.icon').textContent = '⏸';
-    } else {
-        speechSynthesis.cancel();
-        isSpeaking = false;
-        voiceButton.querySelector('.icon').textContent = '🔊';
-    }
-}
-
-function toggleLanguage() {
-    const currentLang = document.querySelector('.content:not([style*="display: none"])').dataset.lang;
-    const nextLang = currentLang === 'fr' ? 'en' : currentLang === 'en' ? 'ar' : 'fr';
-    
-    document.querySelectorAll('.content').forEach(content => {
-        content.style.display = content.dataset.lang === nextLang ? 'block' : 'none';
-    });
-}
-
-function toggleFavorite(chapterId) {
-    const favoriteIcon = document.querySelector(`.favorite[data-chapter="${chapterId}"]`);
-    const user = auth.currentUser;
-    
-    if (user) {
-        const favoriteRef = db.collection('users').doc(user.uid).collection('favorites').doc(chapterId);
-        favoriteIcon.classList.toggle('active');
-        
-        if (favoriteIcon.classList.contains('active')) {
-            favoriteRef.set({ timestamp: firebase.firestore.FieldValue.serverTimestamp() });
-        } else {
-            favoriteRef.delete();
-        }
-    } else {
-        alert('Veuillez vous connecter pour ajouter des favoris.');
-    }
-}
-
-function loadFavorites() {
-    const user = auth.currentUser;
-    if (user) {
-        db.collection('users').doc(user.uid).collection('favorites').get().then(snapshot => {
-            snapshot.forEach(doc => {
-                const chapterId = doc.id;
-                const favoriteIcon = document.querySelector(`.favorite[data-chapter="${chapterId}"]`);
-                if (favoriteIcon) favoriteIcon.classList.add('active');
-            });
-        });
-    }
-}
-
-function navigateChapters() {
-    document.querySelectorAll('.prev-btn, .next-btn').forEach(button => {
-        button.addEventListener('click', () => {
-            const currentSection = document.querySelector('section.active');
-            const allSections = Array.from(document.querySelectorAll('section.chapter'));
-            const currentIndex = allSections.indexOf(currentSection);
-            
-            if (button.classList.contains('prev-btn') && currentIndex > 0) {
-                showSection(`#${allSections[currentIndex - 1].id}`);
-            } else if (button.classList.contains('next-btn') && currentIndex < allSections.length - 1) {
-                showSection(`#${allSections[currentIndex + 1].id}`);
-            }
-            
-            const prevBtn = currentSection.querySelector('.prev-btn');
-            const nextBtn = currentSection.querySelector('.next-btn');
-            if (prevBtn) prevBtn.disabled = currentIndex === 0;
-            if (nextBtn) nextBtn.disabled = currentIndex === allSections.length - 1;
-        });
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').then(() => {
+        console.log('Service Worker registered');
     });
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'dark') {
-        document.body.classList.add('dark-mode');
-        document.querySelector('#theme-toggle .icon').textContent = '☀️';
-    }
+    const homePage = document.getElementById('homePage');
+    const indexPage = document.getElementById('indexPage');
+    const readingPage = document.getElementById('readingPage');
+    const settingsPanel = document.getElementById('settingsPanel');
+    const favoritesPage = document.getElementById('favoritesPage');
+    const textContent = document.getElementById('textContent');
+    const chapTitle = document.getElementById('chapTitle');
+    const themeSelect = document.getElementById('themeSelect');
+    const fontSelect = document.getElementById('fontSelect');
+    const fontSize = document.getElementById('fontSize');
+    const favoritesList = document.getElementById('favoritesList');
+    let favorites = [];
 
-    document.querySelectorAll('.close-btn').forEach(button => {
-        button.addEventListener('click', () => showSection('#home'));
+    // Contenu des 44 chapitres
+    const chapterContents = {
+        1: "Contenu du Chapitre 1 : Lorem ipsum dolor sit amet, consectetur adipiscing elit...",
+        2: "Contenu du Chapitre 2 : Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua...",
+        3: "Contenu du Chapitre 3 : Ut enim ad minim veniam, quis nostrud exercitation ullamco...",
+        4: "Contenu du Chapitre 4 : Duis aute irure dolor in reprehenderit in voluptate velit...",
+        5: "Contenu du Chapitre 5 : Excepteur sint occaecat cupidatat non proident, sunt in culpa...",
+        6: "Contenu du Chapitre 6 : Nemo enim ipsam voluptatem quia voluptas sit aspernatur...",
+        7: "Contenu du Chapitre 7 : At vero eos et accusamus et iusto odio dignissimos...",
+        8: "Contenu du Chapitre 8 : Qui blanditiis praesentium voluptatum deleniti atque corrupti...",
+        9: "Contenu du Chapitre 9 : Quis autem vel eum iure reprehenderit qui in ea voluptate...",
+        10: "Contenu du Chapitre 10 : Neque porro quisquam est, qui dolorem ipsum quia dolor...",
+        11: "Contenu du Chapitre 11 : Nam libero tempore, cum soluta nobis est eligendi optio...",
+        12: "Contenu du Chapitre 12 : Consectetur adipiscing elit, sed do eiusmod tempor incididunt...",
+        13: "Contenu du Chapitre 13 : Ut labore et dolore magna aliqua, ut enim ad minim veniam...",
+        14: "Contenu du Chapitre 14 : Quis nostrud exercitation ullamco laboris nisi ut aliquip...",
+        15: "Contenu du Chapitre 15 : Ex ea commodo consequat, quis aut dolor reprehenderit...",
+        16: "Contenu du Chapitre 16 : Voluptate velit esse cillum dolore eu fugiat nulla pariatur...",
+        17: "Contenu du Chapitre 17 : Occaecat cupidatat non proident, sunt in culpa qui officia...",
+        18: "Contenu du Chapitre 18 : Deserunt mollit anim id est laborum, sed ut perspiciatis...",
+        19: "Contenu du Chapitre 19 : Unde omnis iste natus error sit voluptatem accusantium...",
+        20: "Contenu du Chapitre 20 : Doloremque laudantium, totam rem aperiam, eaque ipsa quae...",
+        21: "Contenu du Chapitre 21 : Ab illo inventore veritatis et quasi architecto beatae...",
+        22: "Contenu du Chapitre 22 : Vitae dicta sunt explicabo, nemo enim ipsam voluptatem...",
+        23: "Contenu du Chapitre 23 : Quia voluptas sit aspernatur aut odit aut fugit, sed quia...",
+        24: "Contenu du Chapitre 24 : Consequuntur magni dolores eos qui ratione voluptatem...",
+        25: "Contenu du Chapitre 25 : Sequi nesciunt, neque porro quisquam est qui dolorem ipsum...",
+        26: "Contenu du Chapitre 26 : Quia dolor sit amet, consectetur adipiscing elit, sed do...",
+        27: "Contenu du Chapitre 27 : Eiusmod tempor incididunt ut labore et dolore magna aliqua...",
+        28: "Contenu du Chapitre 28 : Ut enim ad minim veniam, quis nostrud exercitation ullamco...",
+        29: "Contenu du Chapitre 29 : Laboris nisi ut aliquip ex ea commodo consequat, quis aut...",
+        30: "Contenu du Chapitre 30 : Dolor reprehenderit in voluptate velit esse cillum dolore...",
+        31: "Contenu du Chapitre 31 : Eu fugiat nulla pariatur, excepteur sint occaecat cupidatat...",
+        32: "Contenu du Chapitre 32 : Non proident, sunt in culpa qui officia deserunt mollit...",
+        33: "Contenu du Chapitre 33 : Anim id est laborum, sed ut perspiciatis unde omnis...",
+        34: "Contenu du Chapitre 34 : Iste natus error sit voluptatem accusantium doloremque...",
+        35: "Contenu du Chapitre 35 : Laudantium, totam rem aperiam, eaque ipsa quae ab illo...",
+        36: "Contenu du Chapitre 36 : Inventore veritatis et quasi architecto beatae vitae dicta...",
+        37: "Contenu du Chapitre 37 : Sunt explicabo, nemo enim ipsam voluptatem quia voluptas...",
+        38: "Contenu du Chapitre 38 : Sit aspernatur aut odit aut fugit, sed quia consequuntur...",
+        39: "Contenu du Chapitre 39 : Magni dolores eos qui ratione voluptatem sequi nesciunt...",
+        40: "Contenu du Chapitre 40 : Neque porro quisquam est, qui dolorem ipsum quia dolor...",
+        41: "Contenu du Chapitre 41 : Sit amet, consectetur adipiscing elit, sed do eiusmod...",
+        42: "Contenu du Chapitre 42 : Tempor incididunt ut labore et dolore magna aliqua, ut enim...",
+        43: "Contenu du Chapitre 43 : Ad minim veniam, quis nostrud exercitation ullamco laboris...",
+        44: "Contenu du Chapitre 44 : Nisi ut aliquip ex ea commodo consequat, quis aut dolor..."
+    };
+
+    // Navigation
+    document.querySelector('.start-btn').addEventListener('click', () => {
+        homePage.style.display = 'none';
+        indexPage.style.display = 'block';
     });
 
-    document.querySelectorAll('#chapter-list a').forEach(link => {
-        link.addEventListener('click', (e) => {
-            e.preventDefault();
-            showSection(link.getAttribute('href'));
+    document.querySelectorAll('.index-page li').forEach(li => {
+        li.addEventListener('click', () => {
+            const chapNum = li.getAttribute('data-chap');
+            textContent.innerHTML = chapterContents[chapNum];
+            chapTitle.textContent = `Chapitre ${chapNum}`;
+            indexPage.style.display = 'none';
+            readingPage.style.display = 'block';
         });
     });
 
-    document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
-    document.getElementById('voice-toggle').addEventListener('click', toggleVoice);
-    document.getElementById('language-toggle').addEventListener('click', toggleLanguage);
-
-    speechSynthesis.onvoiceschanged = loadVoices;
-    loadVoices();
-
-    document.querySelectorAll('.favorite').forEach(favorite => {
-        favorite.addEventListener('click', () => toggleFavorite(favorite.dataset.chapter));
-    });
-
-    auth.onAuthStateChanged(user => {
-        if (user) {
-            loadFavorites();
+    document.querySelector('.close-btn').addEventListener('click', () => {
+        if (indexPage.style.display !== 'none') {
+            indexPage.style.display = 'none';
+            homePage.style.display = 'block';
+        } else if (settingsPanel.style.display !== 'none') {
+            settingsPanel.style.display = 'none';
+            readingPage.style.display = 'block';
+        } else if (favoritesPage.style.display !== 'none') {
+            favoritesPage.style.display = 'none';
+            readingPage.style.display = 'block';
         }
     });
 
-    navigateChapters();
-    updateNavbarVisibility();
+    // Paramètres
+    document.querySelector('.settings-btn').addEventListener('click', () => {
+        readingPage.style.display = 'none';
+        settingsPanel.style.display = 'block';
+    });
+
+    themeSelect.addEventListener('change', (e) => {
+        document.body.className = e.target.value === 'dark' ? 'dark' : '';
+    });
+
+    fontSelect.addEventListener('change', (e) => {
+        textContent.style.fontFamily = e.target.value;
+    });
+
+    fontSize.addEventListener('input', (e) => {
+        textContent.style.fontSize = `${e.target.value}px`;
+    });
+
+    // Favoris
+    document.querySelector('.favorite-btn').addEventListener('click', () => {
+        const chapNum = chapTitle.textContent.replace('Chapitre ', '');
+        if (!favorites.includes(chapNum)) {
+            favorites.push(chapNum);
+            updateFavorites();
+        }
+    });
+
+    function updateFavorites() {
+        favoritesList.innerHTML = '';
+        favorites.forEach(chap => {
+            const li = document.createElement('li');
+            li.textContent = `Chapitre ${chap}`;
+            li.addEventListener('click', () => {
+                textContent.innerHTML = chapterContents[chap];
+                chapTitle.textContent = `Chapitre ${chap}`;
+                favoritesPage.style.display = 'none';
+                readingPage.style.display = 'block';
+            });
+            favoritesList.appendChild(li);
+        });
+    }
+
+    // Assistant IA (placeholder pour API Gemini)
+    document.querySelector('.ai-btn').addEventListener('click', () => {
+        alert('Assistant IA : Posez une question sur le livre (API Gemini à intégrer)');
+    });
+
+    // Sécurité
+    document.addEventListener('keydown', (e) => {
+        if (e.ctrlKey || e.metaKey || e.key === 'PrintScreen') {
+            e.preventDefault();
+        }
+    });
+
+    document.addEventListener('contextmenu', (e) => e.preventDefault());
 });
+
+// Service Worker (sw.js) - À créer séparément pour le cache hors connexion
