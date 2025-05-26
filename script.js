@@ -35,12 +35,12 @@ document.addEventListener('DOMContentLoaded', () => {
         1: {
             ar: "بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ<br>ٱلْحَمْدُ لِلَّهِ رَبِّ ٱلْعَٰلَمِينَ",
             en: "In the name of Allah, the Most Gracious, the Most Merciful<br>Praise be to Allah, the Lord of all the worlds",
-            fr: "Au nom d'Allah, , le Très Miséricordieux<br>Louange à Allah, Seigneur des mondes"
+            fr: "Au nom d'Allah, le Tout Miséricordieux, le Très Miséricordieux<br>Louange à Allah, Seigneur des mondes"
         },
         2: {
             ar: "بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ<br>ذَٰلِكَ ٱلْكِتَٰبُ لَا رَيْبَ ۖ فِيهِ هُدًى لِّلْمُتَّقِينَ",
             en: "In the name of Allah, the Most Gracious, the Most Merciful<br>This is the Book about which there is no doubt, a guidance for those conscious of Allah",
-            fr: "Au nom d'Allah, le Tout Miséricordieux, leeux<br>Ceci est le Livre au sujet duquel il n'y a aucun doute, un guide pour les pieux"
+            fr: "Au nom d'Allah, le Tout Miséricordieux, le Très Miséricordieux<br>Ceci est le Livre au sujet duquel il n'y a aucun doute, un guide pour les pieux"
         },
         3: {
             ar: "بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ<br>الم ۝ ٱللَّهُ لَآ إِلَٰهَ إِلَّا هُوَ ٱلْحَىُّ ٱلْقَيُّومُ",
@@ -335,13 +335,6 @@ document.addEventListener('DOMContentLoaded', () => {
         textContent.style.fontSize = `${e.target.value}px`;
     });
 
-    // Mode clair/sombre
-    document.querySelector('.theme-toggle').addEventListener('click', () => {
-        const currentTheme = document.body.className === 'dark' ? 'light' : 'dark';
-        themeSelect.value = currentTheme;
-        document.body.className = currentTheme === 'dark' ? 'dark' : '';
-    });
-
     // Favoris
     document.querySelector('.favorite-btn').addEventListener('click', () => {
         if (!favorites.includes(currentSura)) {
@@ -349,6 +342,12 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.setItem('favorites', JSON.stringify(favorites));
             updateFavorites();
         }
+    });
+
+    document.querySelector('.favorites-btn').addEventListener('click', () => {
+        favoritesPage.style.display = favoritesPage.style.display === 'none' ? 'block' : 'none';
+        readingPage.style.display = favoritesPage.style.display === 'block' ? 'none' : 'block';
+        updateFavorites();
     });
 
     function updateFavorites() {
@@ -406,10 +405,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const utterance = new SpeechSynthesisUtterance(textToRead);
             const voices = synth.getVoices();
             const selectedVoice = voiceSelect.value;
-            utterance.voice = voices.find(voice => voice.name.includes(selectedVoice)) || voices[0];
+            utterance.voice = voices.find(voice => voice.name.includes(selectedVoice.split('-')[0])) || voices[0];
             synth.speak(utterance);
             isPlaying = true;
             voicePlayBtn.innerHTML = '<i class="fas fa-pause"></i> Lecture à haute voix';
+            utterance.onend = () => {
+                isPlaying = false;
+                voicePlayBtn.innerHTML = '<i class="fas fa-play"></i> Lecture à haute voix';
+            };
         }
     });
 
@@ -466,10 +469,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 matches.push({ word, index });
             }
         });
-        console.log(matches); // Pour débogage
         if (matches.length > 0) {
             alert(`Occurrences trouvées : ${matches.length}. Cliquez pour naviguer.`);
-            matches[0].index; // Placeholder pour navigation
         }
     });
 
