@@ -84,6 +84,7 @@
                 <div class="header-icons">
                     <button class="icon-btn theme-toggle"><i class="fas fa-moon"></i></button>
                     <button class="icon-btn settings-btn"><i class="fas fa-cog"></i></button>
+                    <button class="icon-btn index-btn"><i class="fas fa-book-open"></i></button>
                 </div>
             </header>
             <input type="text" placeholder="Recherche" class="search-bar" id="searchBar">
@@ -94,11 +95,16 @@
                 <div class="text-content" id="textContent" style="display: none;">
                     In the name of Allah, the Most Gracious, the Most Merciful<br>Praise be to Allah, the Lord of all the worlds
                 </div>
+                <div class="navigation-buttons">
+                    <button class="nav-btn prev-btn"><i class="fas fa-arrow-left"></i> Précédent</button>
+                    <button class="nav-btn next-btn">Suivant <i class="fas fa-arrow-right"></i></button>
+                </div>
                 <button class="favorite-btn"><i class="fas fa-star"></i></button>
                 <button class="customize-btn"><i class="fas fa-paint-brush"></i></button>
                 <button class="ai-btn"><i class="fas fa-robot"></i> Assistant</button>
             </div>
             <div class="customize-panel" id="customizePanel" style="display: none;">
+                <button class="close-customize-btn"><i class="fas fa-times"></i></button>
                 <div class="color-icons">
                     <button class="color-btn" style="background: #000;" data-color="#000"></button>
                     <button class="color-btn" style="background: #d2c9a3;" data-color="#d2c9a3"></button>
@@ -106,12 +112,23 @@
                     <button class="color-btn" style="background: #e0e0e0;" data-color="#e0e0e0"></button>
                 </div>
                 <div class="option-icons">
-                    <button class="option-btn"><i class="fas fa-book"></i> Tafsir écrit</button>
-                    <button class="option-btn"><i class="fas fa-volume-up"></i> Tafsir audio</button>
-                    <button class="option-btn"><i class="fas fa-user"></i> Récitateur</button>
-                    <button class="option-btn"><i class="fas fa-list"></i> Juz</button>
-                    <button class="option-btn"><i class="fas fa-book-open"></i> Soura</button>
-                    <button class="option-btn"><i class="fas fa-file"></i> Page</button>
+                    <button class="option-btn language-btn"><i class="fas fa-globe"></i> Changement de langue</button>
+                    <button class="option-btn voice-play-btn"><i class="fas fa-play"></i> Lecture à haute voix</button>
+                    <button class="option-btn voice-select-btn"><i class="fas fa-user"></i> Choix de voix</button>
+                    <button class="option-btn index-btn"><i class="fas fa-list"></i> Sommaire</button>
+                    <button class="option-btn note-btn"><i class="fas fa-sticky-note"></i> Note</button>
+                </div>
+                <div class="voice-select-panel" id="voiceSelectPanel" style="display: none;">
+                    <button class="close-voice-btn"><i class="fas fa-times"></i></button>
+                    <select id="voiceSelect">
+                        <option value="voice1">Voix 1 - Ahmed</option>
+                        <option value="voice2">Voix 2 - Fatima</option>
+                        <option value="voice3">Voix 3 - Youssef</option>
+                        <option value="voice4">Voix 4 - Aisha</option>
+                        <option value="voice5">Voix 5 - Omar</option>
+                        <option value="voice6">Voix 6 - Khadija</option>
+                        <option value="voice7">Voix 7 - Ali</option>
+                    </select>
                 </div>
             </div>
         </div>
@@ -157,6 +174,18 @@
                     <label>Taille du texte</label>
                     <input type="range" id="fontSize" min="12" max="30" value="16">
                 </div>
+                <div class="setting">
+                    <label>Connexion</label>
+                    <input type="text" placeholder="Nom d'utilisateur" id="loginUsername">
+                    <input type="password" placeholder="Mot de passe" id="loginPassword">
+                    <button class="auth-btn">Se connecter</button>
+                </div>
+                <div class="setting">
+                    <label>Inscription</label>
+                    <input type="text" placeholder="Nom d'utilisateur" id="registerUsername">
+                    <input type="password" placeholder="Mot de passe" id="registerPassword">
+                    <button class="auth-btn">S'inscrire</button>
+                </div>
             </div>
         </div>
 
@@ -167,6 +196,19 @@
                 <h1>Favoris</h1>
             </header>
             <ul id="favoritesList"></ul>
+        </div>
+
+        <!-- Page Notes -->
+        <div class="notes-page" id="notesPage" style="display: none;">
+            <header>
+                <button class="close-btn"><i class="fas fa-arrow-left"></i></button>
+                <h1>Notes</h1>
+            </header>
+            <div class="notes-content">
+                <input type="text" id="newCategory" placeholder="Nouvelle catégorie">
+                <button class="add-category-btn">Ajouter</button>
+                <div id="categoriesList"></div>
+            </div>
         </div>
     </div>
     <script src="script.js"></script>
