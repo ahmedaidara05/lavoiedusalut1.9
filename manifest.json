@@ -1,6 +1,6 @@
 {
-    "name": "Mon Livre",
-    "short_name": "Livre",
+    "name": "Application Coran",
+    "short_name": "Coran",
     "start_url": "/",
     "display": "standalone",
     "background_color": "#f5f5f0",
