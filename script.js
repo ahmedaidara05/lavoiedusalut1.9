@@ -3,6 +3,26 @@ if ('serviceWorker' in navigator) {
         console.log('Service Worker registered');
     }).catch(err => console.error('Service Worker registration failed:', err));
 }
+// Configuration et initialisation de Firebase
+const firebaseConfig = {
+    apiKey: "AIzaSyAljojXHODwHjStePWkhthWLRzrw3pUslQ",
+    authDomain: "la-voie-du-salut-36409.firebaseapp.com",
+    projectId: "la-voie-du-salut-36409",
+    storageBucket: "la-voie-du-salut-36409.firebasestorage.app",
+    messagingSenderId: "61439310820",
+    appId: "1:61439310820:web:52bfe8b862666ac13d25f1",
+    measurementId: "G-G9S1ST8K3R"
+};
+
+// Initialiser Firebase
+const firebase = window.firebase || (await import('https://www.gstatic.com/firebasejs/9.6.0/firebase-app.js')).default;
+const { initializeApp } = firebase;
+const { getAuth } = await import('https://www.gstatic.com/firebasejs/9.6.0/firebase-auth.js');
+const { getFirestore } = await import('https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore.js');
+
+initializeApp(firebaseConfig);
+const auth = getAuth();
+const db = getFirestore();
 
 document.addEventListener('DOMContentLoaded', () => {
     const homePage = document.getElementById('homePage');
