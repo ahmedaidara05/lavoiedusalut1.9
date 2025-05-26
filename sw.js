@@ -6,7 +6,9 @@ self.addEventListener('install', (event) => {
                 '/index.html',
                 '/styles.css',
                 '/script.js'
-            ]);
+            ]).catch(err => {
+                console.warn('Failed to cache some resources:', err);
+            });
         })
     );
 });
@@ -14,7 +16,10 @@ self.addEventListener('install', (event) => {
 self.addEventListener('fetch', (event) => {
     event.respondWith(
         caches.match(event.request).then((response) => {
-            return response || fetch(event.request);
+            return response || fetch(event.request).catch(() => {
+                console.warn('Network fetch failed for:', event.request.url);
+                return new Response('Resource unavailable offline', { status: 503 });
+            });
         })
     );
 });
