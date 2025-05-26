@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const readingPage = document.getElementById('readingPage');
     const settingsPanel = document.getElementById('settingsPanel');
     const favoritesPage = document.getElementById('favoritesPage');
+    const notesPage = document.getElementById('notesPage');
     const arabicText = document.getElementById('arabicText');
     const textContent = document.getElementById('textContent');
     const suraTitle = document.getElementById('suraTitle');
@@ -19,8 +20,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const fontSize = document.getElementById('fontSize');
     const favoritesList = document.getElementById('favoritesList');
     const searchBar = document.getElementById('searchBar');
-    let favorites = [];
+    const customizePanel = document.getElementById('customizePanel');
+    const voiceSelectPanel = document.getElementById('voiceSelectPanel');
+    const voiceSelect = document.getElementById('voiceSelect');
+    const voicePlayBtn = document.querySelector('.voice-play-btn');
+    let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+    let notes = JSON.parse(localStorage.getItem('notes')) || {};
     let currentSura = 1;
+    let isPlaying = false;
+    let synth = window.speechSynthesis;
 
     // Contenu des 44 sourates en arabe, anglais et français
     const suraContents = {
@@ -254,23 +262,52 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.querySelectorAll('.index-page li').forEach(li => {
         li.addEventListener('click', () => {
-            currentSura = li.getAttribute('data-sura');
+            currentSura = parseInt(li.getAttribute('data-sura'));
             updateContent();
             indexPage.style.display = 'none';
             readingPage.style.display = 'block';
         });
     });
 
-    document.querySelector('.close-btn').addEventListener('click', () => {
-        if (indexPage.style.display !== 'none') {
-            indexPage.style.display = 'none';
-            homePage.style.display = 'block';
-        } else if (settingsPanel.style.display !== 'none') {
-            settingsPanel.style.display = 'none';
-            readingPage.style.display = 'block';
-        } else if (favoritesPage.style.display !== 'none') {
-            favoritesPage.style.display = 'none';
-            readingPage.style.display = 'block';
+    document.querySelectorAll('.close-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            if (indexPage.style.display !== 'none') {
+                indexPage.style.display = 'none';
+                homePage.style.display = 'block';
+            } else if (settingsPanel.style.display !== 'none') {
+                settingsPanel.style.display = 'none';
+                readingPage.style.display = 'block';
+            } else if (favoritesPage.style.display !== 'none') {
+                favoritesPage.style.display = 'none';
+                readingPage.style.display = 'block';
+            } else if (notesPage.style.display !== 'none') {
+                notesPage.style.display = 'none';
+                readingPage.style.display = 'block';
+            }
+        });
+    });
+
+    // Retour au sommaire depuis la page de lecture
+    document.querySelectorAll('.index-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            readingPage.style.display = 'none';
+            indexPage.style.display = 'block';
+            customizePanel.style.display = 'none';
+        });
+    });
+
+    // Navigation entre chapitres
+    document.querySelector('.prev-btn').addEventListener('click', () => {
+        if (currentSura > 1) {
+            currentSura--;
+            updateContent();
+        }
+    });
+
+    document.querySelector('.next-btn').addEventListener('click', () => {
+        if (currentSura < 44) {
+            currentSura++;
+            updateContent();
         }
     });
 
@@ -280,7 +317,7 @@ document.addEventListener('DOMContentLoaded', () => {
         settingsPanel.style.display = 'block';
     });
 
-    languageSelect.addEventListener('change', (e) => {
+    languageSelect.addEventListener('change', () => {
         updateContent();
     });
 
@@ -309,6 +346,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelector('.favorite-btn').addEventListener('click', () => {
         if (!favorites.includes(currentSura)) {
             favorites.push(currentSura);
+            localStorage.setItem('favorites', JSON.stringify(favorites));
             updateFavorites();
         }
     });
@@ -317,7 +355,7 @@ document.addEventListener('DOMContentLoaded', () => {
         favoritesList.innerHTML = '';
         favorites.forEach(sura => {
             const li = document.createElement('li');
-            li.textContent = `Surat ${sura}`;
+            li.innerHTML = `<span class="sura-number">${sura}</span> Surat ${sura}<br>Nombre aya ${suraContents[sura].ar.split('<br>').length - 1} <i class="fas fa-mosque"></i>`;
             li.addEventListener('click', () => {
                 currentSura = sura;
                 updateContent();
@@ -327,11 +365,15 @@ document.addEventListener('DOMContentLoaded', () => {
             favoritesList.appendChild(li);
         });
     }
+    updateFavorites();
 
     // Personnalisation
     document.querySelector('.customize-btn').addEventListener('click', () => {
-        document.getElementById('customizePanel').style.display = 
-            document.getElementById('customizePanel').style.display === 'none' ? 'flex' : 'none';
+        customizePanel.style.display = customizePanel.style.display === 'none' ? 'flex' : 'none';
+    });
+
+    document.querySelector('.close-customize-btn').addEventListener('click', () => {
+        customizePanel.style.display = 'none';
     });
 
     document.querySelectorAll('.color-btn').forEach(btn => {
@@ -339,6 +381,74 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('readingContent').style.backgroundColor = btn.getAttribute('data-color');
         });
     });
+
+    // Changement de langue
+    document.querySelector('.language-btn').addEventListener('click', () => {
+        languageSelect.focus();
+    });
+
+    // Lecture à haute voix
+    document.querySelector('.voice-select-btn').addEventListener('click', () => {
+        voiceSelectPanel.style.display = voiceSelectPanel.style.display === 'none' ? 'block' : 'none';
+    });
+
+    document.querySelector('.close-voice-btn').addEventListener('click', () => {
+        voiceSelectPanel.style.display = 'none';
+    });
+
+    voicePlayBtn.addEventListener('click', () => {
+        if (isPlaying) {
+            synth.cancel();
+            isPlaying = false;
+            voicePlayBtn.innerHTML = '<i class="fas fa-play"></i> Lecture à haute voix';
+        } else {
+            const textToRead = languageSelect.value === 'ar' ? arabicText.innerText : textContent.innerText;
+            const utterance = new SpeechSynthesisUtterance(textToRead);
+            const voices = synth.getVoices();
+            const selectedVoice = voiceSelect.value;
+            utterance.voice = voices.find(voice => voice.name.includes(selectedVoice)) || voices[0];
+            synth.speak(utterance);
+            isPlaying = true;
+            voicePlayBtn.innerHTML = '<i class="fas fa-pause"></i> Lecture à haute voix';
+        }
+    });
+
+    // Notes
+    document.querySelector('.note-btn').addEventListener('click', () => {
+        readingPage.style.display = 'none';
+        notesPage.style.display = 'block';
+        updateNotes();
+    });
+
+    document.querySelector('.add-category-btn').addEventListener('click', () => {
+        const categoryName = document.getElementById('newCategory').value.trim();
+        if (categoryName) {
+            if (!notes[categoryName]) {
+                notes[categoryName] = '';
+            }
+            localStorage.setItem('notes', JSON.stringify(notes));
+            updateNotes();
+            document.getElementById('newCategory').value = '';
+        }
+    });
+
+    function updateNotes() {
+        const categoriesList = document.getElementById('categoriesList');
+        categoriesList.innerHTML = '';
+        for (const category in notes) {
+            const div = document.createElement('div');
+            div.className = 'category';
+            div.innerHTML = `
+                <h3>${category}</h3>
+                <textarea>${notes[category]}</textarea>
+            `;
+            div.querySelector('textarea').addEventListener('input', (e) => {
+                notes[category] = e.target.value;
+                localStorage.setItem('notes', JSON.stringify(notes));
+            });
+            categoriesList.appendChild(div);
+        }
+    }
 
     // Assistant IA
     document.querySelector('.ai-btn').addEventListener('click', () => {
@@ -357,11 +467,23 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
         console.log(matches); // Pour débogage
-        // Implémentation de la navigation manuelle pour l'instant (à améliorer avec surbrillance)
         if (matches.length > 0) {
             alert(`Occurrences trouvées : ${matches.length}. Cliquez pour naviguer.`);
             matches[0].index; // Placeholder pour navigation
         }
+    });
+
+    // Connexion/Inscription
+    document.querySelectorAll('.auth-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const username = btn.parentElement.querySelector('input[type="text"]').value;
+            const password = btn.parentElement.querySelector('input[type="password"]').value;
+            if (btn.textContent === 'Se connecter') {
+                alert(`Connexion avec ${username}`);
+            } else {
+                alert(`Inscription de ${username}`);
+            }
+        });
     });
 
     function updateContent() {
