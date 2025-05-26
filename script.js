@@ -3,6 +3,7 @@ if ('serviceWorker' in navigator) {
         console.log('Service Worker registered');
     }).catch(err => console.error('Service Worker registration failed:', err));
 }
+
 // Configuration et initialisation de Firebase
 const firebaseConfig = {
     apiKey: "AIzaSyAljojXHODwHjStePWkhthWLRzrw3pUslQ",
@@ -15,14 +16,9 @@ const firebaseConfig = {
 };
 
 // Initialiser Firebase
-const firebase = window.firebase || (await import('https://www.gstatic.com/firebasejs/9.6.0/firebase-app.js')).default;
-const { initializeApp } = firebase;
-const { getAuth } = await import('https://www.gstatic.com/firebasejs/9.6.0/firebase-auth.js');
-const { getFirestore } = await import('https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore.js');
-
-initializeApp(firebaseConfig);
-const auth = getAuth();
-const db = getFirestore();
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
 
 document.addEventListener('DOMContentLoaded', () => {
     const homePage = document.getElementById('homePage');
@@ -39,7 +35,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const fontSelect = document.getElementById('fontSelect');
     const fontSize = document.getElementById('fontSize');
     const favoritesList = document.getElementById('favoritesList');
-    const searchBar = document.getElementById('searchBar');
     const customizePanel = document.getElementById('customizePanel');
     const voiceSelectPanel = document.getElementById('voiceSelectPanel');
     const voiceSelect = document.getElementById('voiceSelect');
@@ -223,39 +218,41 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.querySelectorAll('.color-btn').forEach(btn => {
         btn.addEventListener('click', () => {
-            document.getElementById('readingContent').style.backgroundColor = btn.getAttribute('data-color');
+            const color = btn.getAttribute('data-color');
+            document.getElementById('readingContent').style.backgroundColor = color;
+            if (color === '#c89b4a') {
+                document.getElementById('readingContent').style.backgroundColor = '#000';
+            }
         });
     });
 
     // Changement de langue
     document.querySelector('.language-btn').addEventListener('click', () => {
-        languageSelect.focus();
-    });
-document.querySelector('.language-btn').addEventListener('click', () => {
-    const languagePanel = document.createElement('div');
-    languagePanel.className = 'language-panel';
-    languagePanel.innerHTML = `
-        <button class="close-language-btn"><i class="fas fa-times"></i></button>
-        <select id="languageSelectTemp">
-            <option value="fr">Français</option>
-            <option value="en">English</option>
-            <option value="ar">العربية</option>
-        </select>
-        <button class="apply-language-btn">Appliquer</button>
-    `;
-    customizePanel.appendChild(languagePanel);
+        const languagePanel = document.createElement('div');
+        languagePanel.className = 'language-panel';
+        languagePanel.innerHTML = `
+            <button class="close-language-btn"><i class="fas fa-times"></i></button>
+            <select id="languageSelectTemp">
+                <option value="fr">Français</option>
+                <option value="en">English</option>
+                <option value="ar">العربية</option>
+            </select>
+            <button class="apply-language-btn">Appliquer</button>
+        `;
+        customizePanel.appendChild(languagePanel);
 
-    document.querySelector('.close-language-btn').addEventListener('click', () => {
-        customizePanel.removeChild(languagePanel);
+        document.querySelector('.close-language-btn').addEventListener('click', () => {
+            customizePanel.removeChild(languagePanel);
+        });
+
+        document.querySelector('.apply-language-btn').addEventListener('click', () => {
+            const newLanguage = document.getElementById('languageSelectTemp').value;
+            languageSelect.value = newLanguage;
+            updateContent();
+            customizePanel.removeChild(languagePanel);
+        });
     });
 
-    document.querySelector('.apply-language-btn').addEventListener('click', () => {
-        const newLanguage = document.getElementById('languageSelectTemp').value;
-        languageSelect.value = newLanguage;
-        updateContent();
-        customizePanel.removeChild(languagePanel);
-    });
-});
     // Lecture à haute voix
     document.querySelector('.voice-select-btn').addEventListener('click', () => {
         voiceSelectPanel.style.display = voiceSelectPanel.style.display === 'none' ? 'block' : 'none';
@@ -275,15 +272,19 @@ document.querySelector('.language-btn').addEventListener('click', () => {
             if (textToRead) {
                 const utterance = new SpeechSynthesisUtterance(textToRead);
                 const voices = synth.getVoices();
-                const selectedVoice = voiceSelect.value.split('-')[0];
-                utterance.voice = voices.find(voice => voice.name.includes(selectedVoice)) || voices[0];
-                synth.speak(utterance);
-                isPlaying = true;
-                voicePlayBtn.innerHTML = '<i class="fas fa-pause"></i> Lecture à haute voix';
-                utterance.onend = () => {
-                    isPlaying = false;
-                    voicePlayBtn.innerHTML = '<i class="fas fa-play"></i> Lecture à haute voix';
-                };
+                const selectedVoiceName = voiceSelect.value.split('-')[0];
+                utterance.voice = voices.find(voice => voice.name.toLowerCase().includes(selectedVoiceName.toLowerCase())) || voices[0];
+                if (utterance.voice) {
+                    synth.speak(utterance);
+                    isPlaying = true;
+                    voicePlayBtn.innerHTML = '<i class="fas fa-pause"></i> Lecture à haute voix';
+                    utterance.onend = () => {
+                        isPlaying = false;
+                        voicePlayBtn.innerHTML = '<i class="fas fa-play"></i> Lecture à haute voix';
+                    };
+                } else {
+                    alert('Voix non disponible. Utilisation de la voix par défaut.');
+                }
             }
         }
     });
@@ -330,31 +331,27 @@ document.querySelector('.language-btn').addEventListener('click', () => {
         alert('Assistant IA : Posez une question sur le livre (API Gemini à intégrer)');
     });
 
-    // Recherche
-    searchBar.addEventListener('input', (e) => {
-        const searchTerm = e.target.value.toLowerCase();
-        const content = languageSelect.value === 'ar' ? arabicText.innerHTML : textContent.innerHTML;
-        const words = content.split(/<br>/).join(' ').split(' ');
-        const matches = [];
-        words.forEach((word, index) => {
-            if (word.toLowerCase().includes(searchTerm)) {
-                matches.push({ word, index });
-            }
-        });
-        if (matches.length > 0) {
-            alert(`Occurrences trouvées : ${matches.length}. Cliquez pour naviguer.`);
-        }
-    });
-
-    // Connexion/Inscription
+    // Connexion/Inscription avec Firebase
     document.querySelectorAll('.auth-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             const username = btn.parentElement.querySelector('input[type="text"]').value;
             const password = btn.parentElement.querySelector('input[type="password"]').value;
             if (btn.textContent === 'Se connecter') {
-                alert(`Connexion avec ${username}`);
+                auth.signInWithEmailAndPassword(username, password)
+                    .then(userCredential => {
+                        alert(`Connexion réussie avec ${username}`);
+                    })
+                    .catch(error => {
+                        alert(`Erreur de connexion : ${error.message}`);
+                    });
             } else {
-                alert(`Inscription de ${username}`);
+                auth.createUserWithEmailAndPassword(username, password)
+                    .then(userCredential => {
+                        alert(`Inscription réussie pour ${username}`);
+                    })
+                    .catch(error => {
+                        alert(`Erreur d'inscription : ${error.message}`);
+                    });
             }
         });
     });
