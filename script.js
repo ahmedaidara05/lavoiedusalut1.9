@@ -231,7 +231,31 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelector('.language-btn').addEventListener('click', () => {
         languageSelect.focus();
     });
+document.querySelector('.language-btn').addEventListener('click', () => {
+    const languagePanel = document.createElement('div');
+    languagePanel.className = 'language-panel';
+    languagePanel.innerHTML = `
+        <button class="close-language-btn"><i class="fas fa-times"></i></button>
+        <select id="languageSelectTemp">
+            <option value="fr">Français</option>
+            <option value="en">English</option>
+            <option value="ar">العربية</option>
+        </select>
+        <button class="apply-language-btn">Appliquer</button>
+    `;
+    customizePanel.appendChild(languagePanel);
 
+    document.querySelector('.close-language-btn').addEventListener('click', () => {
+        customizePanel.removeChild(languagePanel);
+    });
+
+    document.querySelector('.apply-language-btn').addEventListener('click', () => {
+        const newLanguage = document.getElementById('languageSelectTemp').value;
+        languageSelect.value = newLanguage;
+        updateContent();
+        customizePanel.removeChild(languagePanel);
+    });
+});
     // Lecture à haute voix
     document.querySelector('.voice-select-btn').addEventListener('click', () => {
         voiceSelectPanel.style.display = voiceSelectPanel.style.display === 'none' ? 'block' : 'none';
