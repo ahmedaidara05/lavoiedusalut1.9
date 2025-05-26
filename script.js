@@ -20,6 +20,12 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').then(() => {
+        console.log('Service Worker registered');
+    }).catch(err => console.error('Service Worker registration failed:', err));
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const homePage = document.getElementById('homePage');
     const indexPage = document.getElementById('indexPage');
@@ -35,7 +41,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const fontSelect = document.getElementById('fontSelect');
     const fontSize = document.getElementById('fontSize');
     const favoritesList = document.getElementById('favoritesList');
+    const searchBar = document.getElementById('searchBar');
     const customizePanel = document.getElementById('customizePanel');
+    const languageSelectPanel = document.getElementById('languageSelectPanel');
     const voiceSelectPanel = document.getElementById('voiceSelectPanel');
     const voiceSelect = document.getElementById('voiceSelect');
     const voicePlayBtn = document.querySelector('.voice-play-btn');
@@ -132,6 +140,8 @@ document.addEventListener('DOMContentLoaded', () => {
             readingPage.style.display = 'none';
             indexPage.style.display = 'block';
             customizePanel.style.display = 'none';
+            languageSelectPanel.style.display = 'none';
+            voiceSelectPanel.style.display = 'none';
         });
     });
 
@@ -158,6 +168,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     languageSelect.addEventListener('change', () => {
         updateContent();
+        languageSelectPanel.style.display = 'none';
     });
 
     themeSelect.addEventListener('change', (e) => {
@@ -210,6 +221,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Personnalisation
     document.querySelector('.customize-btn').addEventListener('click', () => {
         customizePanel.style.display = customizePanel.style.display === 'none' ? 'flex' : 'none';
+        languageSelectPanel.style.display = 'none';
+        voiceSelectPanel.style.display = 'none';
     });
 
     document.querySelector('.close-customize-btn').addEventListener('click', () => {
@@ -218,44 +231,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.querySelectorAll('.color-btn').forEach(btn => {
         btn.addEventListener('click', () => {
-            const color = btn.getAttribute('data-color');
-            document.getElementById('readingContent').style.backgroundColor = color;
-            if (color === '#c89b4a') {
-                document.getElementById('readingContent').style.backgroundColor = '#000';
-            }
+            document.getElementById('readingContent').style.backgroundColor = btn.getAttribute('data-color');
         });
     });
 
     // Changement de langue
     document.querySelector('.language-btn').addEventListener('click', () => {
-        const languagePanel = document.createElement('div');
-        languagePanel.className = 'language-panel';
-        languagePanel.innerHTML = `
-            <button class="close-language-btn"><i class="fas fa-times"></i></button>
-            <select id="languageSelectTemp">
-                <option value="fr">Français</option>
-                <option value="en">English</option>
-                <option value="ar">العربية</option>
-            </select>
-            <button class="apply-language-btn">Appliquer</button>
-        `;
-        customizePanel.appendChild(languagePanel);
+        languageSelectPanel.style.display = languageSelectPanel.style.display === 'none' ? 'block' : 'none';
+        voiceSelectPanel.style.display = 'none';
+    });
 
-        document.querySelector('.close-language-btn').addEventListener('click', () => {
-            customizePanel.removeChild(languagePanel);
-        });
-
-        document.querySelector('.apply-language-btn').addEventListener('click', () => {
-            const newLanguage = document.getElementById('languageSelectTemp').value;
-            languageSelect.value = newLanguage;
-            updateContent();
-            customizePanel.removeChild(languagePanel);
-        });
+    document.querySelector('.close-language-btn').addEventListener('click', () => {
+        languageSelectPanel.style.display = 'none';
     });
 
     // Lecture à haute voix
     document.querySelector('.voice-select-btn').addEventListener('click', () => {
         voiceSelectPanel.style.display = voiceSelectPanel.style.display === 'none' ? 'block' : 'none';
+        languageSelectPanel.style.display = 'none';
     });
 
     document.querySelector('.close-voice-btn').addEventListener('click', () => {
@@ -272,19 +265,26 @@ document.addEventListener('DOMContentLoaded', () => {
             if (textToRead) {
                 const utterance = new SpeechSynthesisUtterance(textToRead);
                 const voices = synth.getVoices();
-                const selectedVoiceName = voiceSelect.value.split('-')[0];
-                utterance.voice = voices.find(voice => voice.name.toLowerCase().includes(selectedVoiceName.toLowerCase())) || voices[0];
-                if (utterance.voice) {
-                    synth.speak(utterance);
-                    isPlaying = true;
-                    voicePlayBtn.innerHTML = '<i class="fas fa-pause"></i> Lecture à haute voix';
-                    utterance.onend = () => {
-                        isPlaying = false;
-                        voicePlayBtn.innerHTML = '<i class="fas fa-play"></i> Lecture à haute voix';
-                    };
-                } else {
-                    alert('Voix non disponible. Utilisation de la voix par défaut.');
-                }
+                const selectedVoice = voiceSelect.value;
+                const voiceMap = {
+                    'voice1': 'Arabic', // Ahmed
+                    'voice2': 'Arabic Female', // Fatima
+                    'voice3': 'Arabic', // Youssef
+                    'voice4': 'Arabic Female', // Aisha
+                    'voice5': 'Arabic', // Omar
+                    'voice6': 'Arabic Female', // Khadija
+                    'voice7': 'Arabic' // Ali
+                };
+                const voiceName = voiceMap[selectedVoice] || 'default';
+                utterance.voice = voices.find(voice => voice.name.includes(voiceName)) || voices[0];
+                utterance.lang = languageSelect.value === 'ar' ? 'ar-SA' : (languageSelect.value === 'en' ? 'en-US' : 'fr-FR');
+                synth.speak(utterance);
+                isPlaying = true;
+                voicePlayBtn.innerHTML = '<i class="fas fa-pause"></i> Lecture à haute voix';
+                utterance.onend = () => {
+                    isPlaying = false;
+                    voicePlayBtn.innerHTML = '<i class="fas fa-play"></i> Lecture à haute voix';
+                };
             }
         }
     });
@@ -331,27 +331,45 @@ document.addEventListener('DOMContentLoaded', () => {
         alert('Assistant IA : Posez une question sur le livre (API Gemini à intégrer)');
     });
 
-    // Connexion/Inscription avec Firebase
+    // Recherche
+    searchBar.addEventListener('input', (e) => {
+        const searchTerm = e.target.value.toLowerCase();
+        const content = languageSelect.value === 'ar' ? arabicText.innerHTML : textContent.innerHTML;
+        const words = content.split(/<br>/).join(' ').split(' ');
+        const matches = [];
+        words.forEach((word, index) => {
+            if (word.toLowerCase().includes(searchTerm)) {
+                matches.push({ word, index });
+            }
+        });
+        if (matches.length > 0) {
+            alert(`Occurrences trouvées : ${matches.length}. Cliquez pour naviguer.`);
+        }
+    });
+
+    // Connexion/Inscription avec Firebase (décommenter après activation de Firebase)
     document.querySelectorAll('.auth-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             const username = btn.parentElement.querySelector('input[type="text"]').value;
             const password = btn.parentElement.querySelector('input[type="password"]').value;
             if (btn.textContent === 'Se connecter') {
-                auth.signInWithEmailAndPassword(username, password)
-                    .then(userCredential => {
-                        alert(`Connexion réussie avec ${username}`);
-                    })
-                    .catch(error => {
-                        alert(`Erreur de connexion : ${error.message}`);
-                    });
+                // auth.signInWithEmailAndPassword(username, password)
+                //     .then(userCredential => {
+                //         alert(`Connexion réussie avec ${username}`);
+                //     })
+                //     .catch(error => {
+                //         alert(`Erreur de connexion : ${error.message}`);
+                //     });
+                alert(`Connexion avec ${username}`);
             } else {
-                auth.createUserWithEmailAndPassword(username, password)
-                    .then(userCredential => {
-                        alert(`Inscription réussie pour ${username}`);
-                    })
-                    .catch(error => {
-                        alert(`Erreur d'inscription : ${error.message}`);
-                    });
+                // auth.createUserWithEmailAndPassword(username, password)
+                //     .then(userCredential => {
+                //         alert(`Inscription réussie pour ${username}`);
+                //     })
+                //     .catch(error => {
+                //         alert(`Erreur d'inscription : ${error.message}`);
+                //     });
+                alert(`Inscription de ${username}`);
             }
         });
     });
