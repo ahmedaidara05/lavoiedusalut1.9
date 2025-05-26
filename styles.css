@@ -1,6 +1,8 @@
 body {
-    margin: 0;
     font-family: 'Amiri', serif;
+    margin: 0;
+    background: #f5f5f0;
+    color: #1a3c34;
     transition: all 0.3s ease;
     -webkit-user-select: none;
     -moz-user-select: none;
@@ -12,7 +14,6 @@ body {
 .container {
     height: 100vh;
     overflow: hidden;
-    background: #f5f5f0;
 }
 
 header {
@@ -95,7 +96,7 @@ header h1 {
     background: #e0e0e0;
 }
 
-.chap-number {
+.sura-number {
     display: inline-block;
     width: 30px;
     height: 30px;
@@ -130,14 +131,14 @@ header h1 {
     position: relative;
 }
 
-.text-content {
+.arabic-text, .text-content {
     font-size: 16px;
     line-height: 1.6;
     color: #1a3c34;
     margin-bottom: 60px;
 }
 
-.favorite-btn, .ai-btn {
+.favorite-btn, .customize-btn, .ai-btn {
     position: fixed;
     bottom: 10px;
     background: #1a3c34;
@@ -152,8 +153,53 @@ header h1 {
     left: 10px;
 }
 
+.customize-btn {
+    left: 50%;
+    transform: translateX(-50%);
+}
+
 .ai-btn {
     right: 10px;
+}
+
+.customize-panel {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: #f5f5f0;
+    padding: 10px;
+    border-top: 1px solid #d2c9a3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.color-icons, .option-icons {
+    display: flex;
+    gap: 10px;
+    margin: 5px 0;
+}
+
+.color-btn {
+    width: 30px;
+    height: 30px;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 5px rgba(0,0,0,0.2);
+}
+
+.option-btn {
+    width: auto;
+    height: auto;
+    padding: 5px 10px;
+    border-radius: 5px;
+    background: #d2c9a3;
+    border: none;
+    display: flex;
+    align-items: center;
+    gap: 5px;
 }
 
 .header-icons {
@@ -228,7 +274,7 @@ body.dark .favorites-page {
     background: #2a2a2a;
 }
 
-body.dark .favorite-btn, body.dark .ai-btn {
+body.dark .favorite-btn, body.dark .customize-btn, body.dark .ai-btn {
     background: #333;
 }
 
