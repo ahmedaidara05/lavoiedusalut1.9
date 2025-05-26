@@ -48,6 +48,16 @@ header h1 {
     margin-right: 10px;
 }
 
+.close-customize-btn, .close-voice-btn {
+    background: none;
+    border: none;
+    color: #1a3c34;
+    font-size: 20px;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
 .home-page {
     padding: 60px 20px 20px;
     height: 100vh;
@@ -138,6 +148,21 @@ header h1 {
     margin-bottom: 60px;
 }
 
+.navigation-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.nav-btn {
+    background: #1a3c34;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
 .favorite-btn, .customize-btn, .ai-btn {
     position: fixed;
     bottom: 10px;
@@ -202,6 +227,21 @@ header h1 {
     gap: 5px;
 }
 
+.voice-select-panel {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: #f5f5f0;
+    padding: 10px;
+    border-top: 1px solid #d2c9a3;
+}
+
+.voice-select-panel select {
+    width: 100%;
+    padding: 5px;
+}
+
 .header-icons {
     display: flex;
     gap: 10px;
@@ -230,9 +270,19 @@ header h1 {
     margin-bottom: 5px;
 }
 
-.setting select, .setting input[type="range"] {
+.setting input, .setting select {
     width: 100%;
     padding: 5px;
+    margin-bottom: 5px;
+}
+
+.auth-btn {
+    width: 100%;
+    background: #1a3c34;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
 }
 
 .favorites-page {
@@ -250,7 +300,60 @@ header h1 {
 #favoritesList li {
     padding: 10px;
     border-bottom: 1px solid #d2c9a3;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+#favoritesList li:hover {
+    background: #e0e0e0;
+}
+
+.notes-page {
+    padding: 60px 20px 20px;
+    height: 100vh;
+    overflow-y: auto;
+    background: #f5f5f0;
+}
+
+.notes-content {
+    padding: 20px;
+}
+
+#newCategory {
+    width: 100%;
+    padding: 5px;
+    margin-bottom: 10px;
+}
+
+.add-category-btn {
+    width: 100%;
+    background: #1a3c34;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.category {
+    margin-bottom: 10px;
+}
+
+.category h3 {
+    margin: 0;
+    padding: 5px;
+    background: #d2c9a3;
+    border-radius: 5px;
+}
+
+.category textarea {
+    width: 100%;
+    height: 100px;
+    padding: 5px;
+    border: 1px solid #d2c9a3;
+    border-radius: 5px;
 }
 
 body.dark {
