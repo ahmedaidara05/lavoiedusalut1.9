@@ -17,21 +17,23 @@ body {
 }
 
 header {
-    background: #1a3c34;
+    background: #1a3c34; /* Couleur verte corrigée */
     color: white;
     display: flex;
     align-items: center;
-    padding: 10px 20px; /* Ajusté pour éviter le découpage */
+    padding: 10px 0; /* Padding ajusté pour toute la largeur */
     position: fixed;
-    width: 100%;
+    width: 100%; /* Assure la largeur complète */
     top: 0;
     box-sizing: border-box;
+    z-index: 1000;
+    left: 0; /* Corrige l'alignement gauche */
 }
 
 .logo {
     width: 30px;
     height: 30px;
-    margin-right: 15px; /* Plus d'espace pour éviter le découpage */
+    margin: 0 15px; /* Ajusté pour un alignement correct */
 }
 
 header h1 {
@@ -46,7 +48,7 @@ header h1 {
     border: none;
     color: white;
     font-size: 20px;
-    margin-right: 15px; /* Ajusté pour un meilleur espacement */
+    margin: 0 15px; /* Ajusté pour alignement */
 }
 
 .close-customize-btn, .close-voice-btn {
@@ -56,7 +58,7 @@ header h1 {
     font-size: 20px;
     position: absolute;
     top: 10px;
-    right: 15px; /* Ajusté pour éviter le découpage */
+    right: 15px;
 }
 
 .home-page {
@@ -79,6 +81,13 @@ header h1 {
     border-radius: 5px;
     margin-top: 20px;
     cursor: pointer;
+}
+
+.book-description {
+    font-size: 16px; /* Augmentation de la police */
+    color: #666;
+    margin-top: 15px;
+    line-height: 1.5;
 }
 
 .index-page {
@@ -125,10 +134,10 @@ header h1 {
 }
 
 .search-bar {
-    width: 90%; /* Ajusté pour éviter le découpage */
-    max-width: 500px; /* Largeur maximale pour centrer */
+    width: 90%;
+    max-width: 500px;
     padding: 5px;
-    margin: 60px auto 10px; /* Centré avec margin auto */
+    margin: 60px auto 20px;
     background: #1a3c34;
     color: white;
     border: none;
@@ -163,10 +172,10 @@ header h1 {
 }
 
 .content {
-    margin-top: 110px; /* Ajusté pour laisser de la place à la barre de recherche */
+    margin-top: 0;
     padding: 20px;
-    height: calc(100vh - 110px);
-    background: #fff;
+    height: 100%;
+    background: inherit;
     position: relative;
 }
 
@@ -175,6 +184,11 @@ header h1 {
     line-height: 1.6;
     color: #1a3c34;
     margin-bottom: 60px;
+}
+
+.arabic-text .bismillah, .text-content .bismillah {
+    font-size: 24px;
+    font-weight: bold;
 }
 
 .navigation-buttons {
@@ -192,28 +206,38 @@ header h1 {
     cursor: pointer;
 }
 
-.favorite-btn, .customize-btn, .ai-btn {
+.voice-play-btn {
     position: fixed;
     bottom: 10px;
+    left: 10px;
     background: #1a3c34;
     color: white;
     border: none;
     padding: 10px;
     border-radius: 5px;
-    margin: 0 10px;
-}
-
-.favorite-btn {
-    left: 10px;
 }
 
 .customize-btn {
+    position: fixed;
+    bottom: 10px;
     left: 50%;
     transform: translateX(-50%);
+    background: #1a3c34;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
 }
 
 .ai-btn {
+    position: fixed;
+    bottom: 10px;
     right: 10px;
+    background: #1a3c34;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
 }
 
 .customize-panel {
@@ -222,7 +246,7 @@ header h1 {
     left: 0;
     width: 100%;
     background: #f5f5f0;
-    padding: 15px; /* Ajusté pour un meilleur espacement */
+    padding: 15px;
     border-top: 1px solid #d2c9a3;
     display: none;
     flex-direction: column;
@@ -259,27 +283,10 @@ header h1 {
     gap: 5px;
 }
 
-.voice-select-panel {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    background: #f5f5f0;
-    padding: 15px; /* Ajusté pour un meilleur espacement */
-    border-top: 1px solid #d2c9a3;
-    display: none;
-    box-sizing: border-box;
-}
-
-.voice-select-panel select {
-    width: 100%;
-    padding: 5px;
-}
-
 .header-icons {
     display: flex;
-    gap: 15px; /* Plus d'espace entre les icônes */
-    margin-left: 15px; /* Ajusté pour éviter le découpage */
+    gap: 15px;
+    margin-left: 15px;
 }
 
 .icon-btn {
@@ -401,7 +408,7 @@ body.dark {
 }
 
 body.dark .content {
-    background: #2a2a2a;
+    background: inherit;
 }
 
 body.dark .index-page {
