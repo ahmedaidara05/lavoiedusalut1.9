@@ -1,9 +1,3 @@
-if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js').then(() => {
-        console.log('Service Worker registered');
-    }).catch(err => console.error('Service Worker registration failed:', err));
-}
-
 // Configuration et initialisation de Firebase
 const firebaseConfig = {
     apiKey: "AIzaSyAljojXHODwHjStePWkhthWLRzrw3pUslQ",
@@ -42,8 +36,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const fontSize = document.getElementById('fontSize');
     const favoritesList = document.getElementById('favoritesList');
     const searchBar = document.getElementById('searchBar');
+    const searchResults = document.getElementById('searchResults');
     const customizePanel = document.getElementById('customizePanel');
-    const languageSelectPanel = document.getElementById('languageSelectPanel');
     const voiceSelectPanel = document.getElementById('voiceSelectPanel');
     const voiceSelect = document.getElementById('voiceSelect');
     const voicePlayBtn = document.querySelector('.voice-play-btn');
@@ -52,6 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentSura = 1;
     let isPlaying = false;
     let synth = window.speechSynthesis;
+    let currentFontSize = 16;
 
     // Contenu des 44 sourates en arabe, anglais et français
     const suraContents = {
@@ -140,8 +135,6 @@ document.addEventListener('DOMContentLoaded', () => {
             readingPage.style.display = 'none';
             indexPage.style.display = 'block';
             customizePanel.style.display = 'none';
-            languageSelectPanel.style.display = 'none';
-            voiceSelectPanel.style.display = 'none';
         });
     });
 
@@ -168,7 +161,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     languageSelect.addEventListener('change', () => {
         updateContent();
-        languageSelectPanel.style.display = 'none';
     });
 
     themeSelect.addEventListener('change', (e) => {
@@ -221,8 +213,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Personnalisation
     document.querySelector('.customize-btn').addEventListener('click', () => {
         customizePanel.style.display = customizePanel.style.display === 'none' ? 'flex' : 'none';
-        languageSelectPanel.style.display = 'none';
-        voiceSelectPanel.style.display = 'none';
     });
 
     document.querySelector('.close-customize-btn').addEventListener('click', () => {
@@ -237,18 +227,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Changement de langue
     document.querySelector('.language-btn').addEventListener('click', () => {
-        languageSelectPanel.style.display = languageSelectPanel.style.display === 'none' ? 'block' : 'none';
-        voiceSelectPanel.style.display = 'none';
+        const lang = prompt('Choisissez une langue (fr/en/ar):', languageSelect.value);
+        if (lang && ['fr', 'en', 'ar'].includes(lang)) {
+            languageSelect.value = lang;
+            updateContent();
+        }
     });
 
-    document.querySelector('.close-language-btn').addEventListener('click', () => {
-        languageSelectPanel.style.display = 'none';
+    // Zoom
+    document.querySelector('.zoom-in-btn').addEventListener('click', () => {
+        currentFontSize = Math.min(currentFontSize + 2, 30);
+        arabicText.style.fontSize = `${currentFontSize}px`;
+        textContent.style.fontSize = `${currentFontSize}px`;
+    });
+
+    document.querySelector('.zoom-out-btn').addEventListener('click', () => {
+        currentFontSize = Math.max(currentFontSize - 2, 12);
+        arabicText.style.fontSize = `${currentFontSize}px`;
+        textContent.style.fontSize = `${currentFontSize}px`;
     });
 
     // Lecture à haute voix
     document.querySelector('.voice-select-btn').addEventListener('click', () => {
         voiceSelectPanel.style.display = voiceSelectPanel.style.display === 'none' ? 'block' : 'none';
-        languageSelectPanel.style.display = 'none';
     });
 
     document.querySelector('.close-voice-btn').addEventListener('click', () => {
@@ -265,18 +266,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (textToRead) {
                 const utterance = new SpeechSynthesisUtterance(textToRead);
                 const voices = synth.getVoices();
-                const selectedVoice = voiceSelect.value;
-                const voiceMap = {
-                    'voice1': 'Arabic', // Ahmed
-                    'voice2': 'Arabic Female', // Fatima
-                    'voice3': 'Arabic', // Youssef
-                    'voice4': 'Arabic Female', // Aisha
-                    'voice5': 'Arabic', // Omar
-                    'voice6': 'Arabic Female', // Khadija
-                    'voice7': 'Arabic' // Ali
-                };
-                const voiceName = voiceMap[selectedVoice] || 'default';
-                utterance.voice = voices.find(voice => voice.name.includes(voiceName)) || voices[0];
+                const selectedVoiceName = voiceSelect.value.split('-')[0];
+                utterance.voice = voices.find(voice => voice.name.toLowerCase().includes(selectedVoiceName.toLowerCase())) || voices[0];
                 utterance.lang = languageSelect.value === 'ar' ? 'ar-SA' : (languageSelect.value === 'en' ? 'en-US' : 'fr-FR');
                 synth.speak(utterance);
                 isPlaying = true;
@@ -331,45 +322,85 @@ document.addEventListener('DOMContentLoaded', () => {
         alert('Assistant IA : Posez une question sur le livre (API Gemini à intégrer)');
     });
 
-    // Recherche
+    // Recherche intelligente
     searchBar.addEventListener('input', (e) => {
-        const searchTerm = e.target.value.toLowerCase();
-        const content = languageSelect.value === 'ar' ? arabicText.innerHTML : textContent.innerHTML;
-        const words = content.split(/<br>/).join(' ').split(' ');
-        const matches = [];
-        words.forEach((word, index) => {
-            if (word.toLowerCase().includes(searchTerm)) {
-                matches.push({ word, index });
+        const searchTerm = e.target.value.trim().toLowerCase();
+        searchResults.style.display = searchTerm ? 'block' : 'none';
+        searchResults.innerHTML = '';
+
+        if (searchTerm) {
+            const allText = {};
+            for (let sura = 1; sura <= 44; sura++) {
+                ['ar', 'en', 'fr'].forEach(lang => {
+                    if (suraContents[sura] && suraContents[sura][lang]) {
+                        const lines = suraContents[sura][lang].split('<br>');
+                        lines.forEach((line, index) => {
+                            if (line.toLowerCase().includes(searchTerm)) {
+                                if (!allText[sura]) allText[sura] = {};
+                                if (!allText[sura][lang]) allText[sura][lang] = [];
+                                allText[sura][lang].push({ text: line, lineIndex: index });
+                            }
+                        });
+                    }
+                });
             }
-        });
-        if (matches.length > 0) {
-            alert(`Occurrences trouvées : ${matches.length}. Cliquez pour naviguer.`);
+
+            for (let sura in allText) {
+                for (let lang in allText[sura]) {
+                    allText[sura][lang].forEach(result => {
+                        const div = document.createElement('div');
+                        div.className = 'result-item';
+                        div.innerHTML = `<strong>Surat ${sura} (${lang.toUpperCase()})</strong><br>${result.text}`;
+                        div.addEventListener('click', () => {
+                            currentSura = parseInt(sura);
+                            languageSelect.value = lang;
+                            updateContent();
+                            const lines = suraContents[currentSura][lang].split('<br>');
+                            arabicText.innerHTML = suraContents[currentSura][lang];
+                            textContent.innerHTML = suraContents[currentSura][lang];
+                            if (lang === 'ar') {
+                                arabicText.style.display = 'block';
+                                textContent.style.display = 'none';
+                            } else {
+                                arabicText.style.display = 'none';
+                                textContent.style.display = 'block';
+                            }
+                            const targetElement = lang === 'ar' ? arabicText : textContent;
+                            const targetLines = targetElement.innerHTML.split('<br>');
+                            targetLines[result.lineIndex] = `<span style="background: yellow">${targetLines[result.lineIndex]}</span>`;
+                            targetElement.innerHTML = targetLines.join('<br>');
+                            targetElement.scrollTop = targetElement.scrollHeight * (result.lineIndex / targetLines.length);
+                            searchResults.style.display = 'none';
+                            searchBar.value = '';
+                        });
+                        searchResults.appendChild(div);
+                    });
+                }
+            }
         }
     });
 
-    // Connexion/Inscription avec Firebase (décommenter après activation de Firebase)
+    // Connexion/Inscription
     document.querySelectorAll('.auth-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             const username = btn.parentElement.querySelector('input[type="text"]').value;
             const password = btn.parentElement.querySelector('input[type="password"]').value;
             if (btn.textContent === 'Se connecter') {
-                // auth.signInWithEmailAndPassword(username, password)
-                //     .then(userCredential => {
-                //         alert(`Connexion réussie avec ${username}`);
-                //     })
-                //     .catch(error => {
-                //         alert(`Erreur de connexion : ${error.message}`);
-                //     });
-                alert(`Connexion avec ${username}`);
+                auth.signInWithEmailAndPassword(username, password)
+                    .then((userCredential) => {
+                        alert(`Connexion réussie avec ${username}`);
+                    })
+                    .catch((error) => {
+                        alert('Erreur de connexion : ' + error.message);
+                    });
             } else {
-                // auth.createUserWithEmailAndPassword(username, password)
-                //     .then(userCredential => {
-                //         alert(`Inscription réussie pour ${username}`);
-                //     })
-                //     .catch(error => {
-                //         alert(`Erreur d'inscription : ${error.message}`);
-                //     });
-                alert(`Inscription de ${username}`);
+                auth.createUserWithEmailAndPassword(username, password)
+                    .then((userCredential) => {
+                        alert(`Inscription réussie pour ${username}`);
+                    })
+                    .catch((error) => {
+                        alert('Erreur d\'inscription : ' + error.message);
+                    });
             }
         });
     });
