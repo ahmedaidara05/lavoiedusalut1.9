@@ -5,7 +5,9 @@ self.addEventListener('install', (event) => {
                 '/',
                 '/index.html',
                 '/styles.css',
-                '/script.js'
+                '/script.js',
+                '/sura-content.js', // Ajout du nouveau fichier
+                '/logo.png'
             ]).catch(err => {
                 console.warn('Failed to cache some resources:', err);
             });
