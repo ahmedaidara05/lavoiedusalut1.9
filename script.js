@@ -54,13 +54,14 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    // Navigation
+    // Navigation - Correction du clic sur les chapitres du sommaire
     document.querySelectorAll('.index-page li').forEach(li => {
         li.addEventListener('click', () => {
             currentSura = parseInt(li.getAttribute('data-sura'));
             updateContent();
-            indexPage.style.display = 'none';
-            readingPage.style.display = 'block';
+            indexPage.style.display = 'none'; // Masquer la page du sommaire
+            readingPage.style.display = 'block'; // Afficher la page de lecture
+            updateFavoritesButton();
         });
     });
 
