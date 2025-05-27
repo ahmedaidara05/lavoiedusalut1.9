@@ -14,6 +14,7 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
+// Enregistrement du Service Worker
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js').then(() => {
         console.log('Service Worker registered');
@@ -54,35 +55,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Navigation
-    document.querySelector('.start-btn').addEventListener('click', () => {
-        homePage.style.display = 'none';
-        indexPage.style.display = 'block';
-    });
-
     document.querySelectorAll('.index-page li').forEach(li => {
         li.addEventListener('click', () => {
             currentSura = parseInt(li.getAttribute('data-sura'));
             updateContent();
             indexPage.style.display = 'none';
             readingPage.style.display = 'block';
-        });
-    });
-
-    document.querySelectorAll('.close-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            if (indexPage.style.display !== 'none') {
-                indexPage.style.display = 'none';
-                homePage.style.display = 'block';
-            } else if (settingsPanel.style.display !== 'none') {
-                settingsPanel.style.display = 'none';
-                readingPage.style.display = 'block';
-            } else if (favoritesPage.style.display !== 'none') {
-                favoritesPage.style.display = 'none';
-                readingPage.style.display = 'block';
-            } else if (notesPage.style.display !== 'none') {
-                notesPage.style.display = 'none';
-                readingPage.style.display = 'block';
-            }
         });
     });
 
@@ -132,43 +110,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     fontSize.addEventListener('input', (e) => {
-        arabicText.style.fontSize = `${e.target.value}px`;
-        textContent.style.fontSize = `${e.target.value}px`;
+        currentFontSize = e.target.value;
+        arabicText.style.fontSize = `${currentFontSize}px`;
+        textContent.style.fontSize = `${currentFontSize}px`;
     });
 
     // Favoris
-    favoritesBtn.addEventListener('click', () => {
-        if (favoritesPage.style.display === 'none') {
-            favoritesPage.style.display = 'block';
-            readingPage.style.display = 'none';
-            updateFavorites();
-        } else {
-            favoritesPage.style.display = 'none';
-            readingPage.style.display = 'block';
-        }
-    });
-
-    document.querySelector('.voice-play-btn').addEventListener('click', () => {
-        if (isPlaying) {
-            synth.cancel();
-            isPlaying = false;
-            voicePlayBtn.innerHTML = '<i class="fas fa-play"></i> Lecture à haute voix';
-        } else {
-            const textToRead = languageSelect.value === 'ar' ? arabicText.innerText : textContent.innerText;
-            if (textToRead) {
-                const utterance = new SpeechSynthesisUtterance(textToRead);
-                utterance.lang = languageSelect.value === 'ar' ? 'ar-SA' : (languageSelect.value === 'en' ? 'en-US' : 'fr-FR');
-                synth.speak(utterance);
-                isPlaying = true;
-                voicePlayBtn.innerHTML = '<i class="fas fa-pause"></i> Lecture à haute voix';
-                utterance.onend = () => {
-                    isPlaying = false;
-                    voicePlayBtn.innerHTML = '<i class="fas fa-play"></i> Lecture à haute voix';
-                };
-            }
-        }
-    });
-
     function updateFavoritesButton() {
         favoritesBtn.textContent = favorites.includes(currentSura) ? '★' : '☆';
     }
@@ -204,6 +151,37 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     updateFavorites();
+
+    // Afficher la page des favoris
+    favoritesBtn.addEventListener('click', () => {
+        if (favoritesPage.style.display === 'none') {
+            favoritesPage.style.display = 'block';
+            readingPage.style.display = 'none';
+            updateFavorites();
+        }
+    });
+
+    // Lecture à haute voix
+    document.querySelector('.voice-play-btn').addEventListener('click', () => {
+        if (isPlaying) {
+            synth.cancel();
+            isPlaying = false;
+            voicePlayBtn.innerHTML = '<i class="fas fa-play"></i> Lecture à haute voix';
+        } else {
+            const textToRead = languageSelect.value === 'ar' ? arabicText.innerText : textContent.innerText;
+            if (textToRead) {
+                const utterance = new SpeechSynthesisUtterance(textToRead);
+                utterance.lang = languageSelect.value === 'ar' ? 'ar-SA' : (languageSelect.value === 'en' ? 'en-US' : 'fr-FR');
+                synth.speak(utterance);
+                isPlaying = true;
+                voicePlayBtn.innerHTML = '<i class="fas fa-pause"></i> Lecture à haute voix';
+                utterance.onend = () => {
+                    isPlaying = false;
+                    voicePlayBtn.innerHTML = '<i class="fas fa-play"></i> Lecture à haute voix';
+                };
+            }
+        }
+    });
 
     // Personnalisation
     document.querySelector('.customize-btn').addEventListener('click', () => {
@@ -310,18 +288,8 @@ document.addEventListener('DOMContentLoaded', () => {
                             currentSura = parseInt(sura);
                             languageSelect.value = lang;
                             updateContent();
-                            const lines = suraContents[currentSura][lang].split('<br>');
-                            arabicText.innerHTML = suraContents[currentSura][lang];
-                            textContent.innerHTML = suraContents[currentSura][lang];
-                            if (lang === 'ar') {
-                                arabicText.style.display = 'block';
-                                textContent.style.display = 'none';
-                            } else {
-                                arabicText.style.display = 'none';
-                                textContent.style.display = 'block';
-                            }
                             const targetElement = lang === 'ar' ? arabicText : textContent;
-                            const targetLines = targetElement.innerHTML.split('<br>');
+                            const targetLines = (lang === 'ar' ? arabicText.innerHTML : textContent.innerHTML).split('<br>');
                             targetLines[result.lineIndex] = `<span style="background: yellow">${targetLines[result.lineIndex]}</span>`;
                             targetElement.innerHTML = targetLines.join('<br>');
                             targetElement.scrollTop = targetElement.scrollHeight * (result.lineIndex / targetLines.length);
