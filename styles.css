@@ -1,8 +1,7 @@
 body {
     font-family: 'Amiri', serif;
     margin: 0;
-    background: url('https://via.placeholder.com/1920x1080') no-repeat center center fixed;
-    background-size: cover;
+    background: #f5f5f0;
     color: #1a3c34;
     transition: all 0.3s ease;
     -webkit-user-select: none;
@@ -18,21 +17,21 @@ body {
 }
 
 header {
-    background: rgba(26, 60, 52, 0.8);
+    background: #1a3c34;
     color: white;
     display: flex;
     align-items: center;
-    padding: 10px;
+    padding: 10px 20px; /* Ajusté pour éviter le découpage */
     position: fixed;
     width: 100%;
     top: 0;
-    backdrop-filter: blur(5px);
+    box-sizing: border-box;
 }
 
 .logo {
     width: 30px;
     height: 30px;
-    margin-right: 10px;
+    margin-right: 15px; /* Plus d'espace pour éviter le découpage */
 }
 
 header h1 {
@@ -47,87 +46,46 @@ header h1 {
     border: none;
     color: white;
     font-size: 20px;
-    margin-right: 10px;
+    margin-right: 15px; /* Ajusté pour un meilleur espacement */
 }
 
-.close-customize-btn, .close-voice-btn, .close-language-btn {
+.close-customize-btn, .close-voice-btn {
     background: none;
     border: none;
     color: #1a3c34;
     font-size: 20px;
     position: absolute;
     top: 10px;
-    right: 10px;
+    right: 15px; /* Ajusté pour éviter le découpage */
 }
 
 .home-page {
+    padding: 60px 20px 20px;
     height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    overflow-y: auto;
     text-align: center;
-    position: relative;
-    background: rgba(245, 245, 240, 0.8);
-    padding: 20px;
 }
 
-.welcome-content {
-    position: relative;
-    z-index: 1;
+.cover img {
+    max-width: 100%;
+    height: auto;
 }
 
 .start-btn {
     background: #1a3c34;
     color: white;
     border: none;
-    padding: 15px 30px;
+    padding: 10px 20px;
     border-radius: 5px;
-    margin-right: 20px;
+    margin-top: 20px;
     cursor: pointer;
-    font-size: 18px;
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%) translateY(-50%);
-    top: 40%;
-}
-
-.title {
-    font-size: 48px;
-    color: #fff;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-    margin: 0;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translateX(-50%) translateY(-50%);
-    z-index: 1;
-}
-
-.description {
-    position: absolute;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 80%;
-    max-width: 600px;
-    background: rgba(255, 255, 255, 0.9);
-    padding: 20px;
-    border-radius: 10px;
-    text-align: left;
-    font-size: 16px;
-    color: #1a3c34;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-}
-
-.description p {
-    margin: 0;
 }
 
 .index-page {
     padding: 60px 20px 20px;
     height: 100vh;
     overflow-y: auto;
-    background: rgba(255, 255, 255, 0.9);
+    background: #fff;
 }
 
 .index-page ul {
@@ -167,20 +125,48 @@ header h1 {
 }
 
 .search-bar {
-    width: 100%;
+    width: 90%; /* Ajusté pour éviter le découpage */
+    max-width: 500px; /* Largeur maximale pour centrer */
     padding: 5px;
-    margin: 60px 10px 10px;
+    margin: 60px auto 10px; /* Centré avec margin auto */
     background: #1a3c34;
     color: white;
     border: none;
     border-radius: 5px;
+    display: block;
+    text-align: center;
+}
+
+.search-results {
+    position: fixed;
+    top: 100px;
+    left: 0;
+    right: 0;
+    background: #fff;
+    border: 1px solid #d2c9a3;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 1000;
+    padding: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.search-results .result-item {
+    padding: 5px;
+    border-bottom: 1px solid #d2c9a3;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.search-results .result-item:hover {
+    background: #e0e0e0;
 }
 
 .content {
-    margin-top: 80px;
+    margin-top: 110px; /* Ajusté pour laisser de la place à la barre de recherche */
     padding: 20px;
-    height: calc(100vh - 80px);
-    background: #c89b4a;
+    height: calc(100vh - 110px);
+    background: #fff;
     position: relative;
 }
 
@@ -236,17 +222,20 @@ header h1 {
     left: 0;
     width: 100%;
     background: #f5f5f0;
-    padding: 10px;
+    padding: 15px; /* Ajusté pour un meilleur espacement */
     border-top: 1px solid #d2c9a3;
     display: none;
     flex-direction: column;
     align-items: center;
+    box-sizing: border-box;
 }
 
 .color-icons, .option-icons {
     display: flex;
     gap: 10px;
     margin: 5px 0;
+    flex-wrap: wrap;
+    justify-content: center;
 }
 
 .color-btn {
@@ -270,25 +259,27 @@ header h1 {
     gap: 5px;
 }
 
-.language-select-panel, .voice-select-panel {
+.voice-select-panel {
     position: fixed;
     bottom: 0;
     left: 0;
     width: 100%;
     background: #f5f5f0;
-    padding: 10px;
+    padding: 15px; /* Ajusté pour un meilleur espacement */
     border-top: 1px solid #d2c9a3;
     display: none;
+    box-sizing: border-box;
 }
 
-.language-select-panel select, .voice-select-panel select {
+.voice-select-panel select {
     width: 100%;
     padding: 5px;
 }
 
 .header-icons {
     display: flex;
-    gap: 10px;
+    gap: 15px; /* Plus d'espace entre les icônes */
+    margin-left: 15px; /* Ajusté pour éviter le découpage */
 }
 
 .icon-btn {
@@ -320,20 +311,24 @@ header h1 {
     margin-bottom: 5px;
 }
 
-.auth-btn {
+.auth-btn, .link-btn {
     width: 100%;
     background: #1a3c34;
     color: white;
     border: none;
     padding: 10px;
     border-radius: 5px;
+    text-align: center;
+    text-decoration: none;
+    display: block;
+    margin-bottom: 5px;
 }
 
 .favorites-page {
     padding: 60px 20px 20px;
     height: 100vh;
     overflow-y: auto;
-    background: rgba(255, 255, 255, 0.9);
+    background: #fff;
 }
 
 #favoritesList {
@@ -401,8 +396,7 @@ header h1 {
 }
 
 body.dark {
-    background: #1a1a1a url('https://via.placeholder.com/1920x1080') no-repeat center center fixed;
-    background-size: cover;
+    background: #1a1a1a;
     color: #f5f5f0;
 }
 
@@ -420,6 +414,15 @@ body.dark .index-page li:hover {
 
 body.dark .favorites-page {
     background: #2a2a2a;
+}
+
+body.dark .search-results {
+    background: #2a2a2a;
+    color: #f5f5f0;
+}
+
+body.dark .search-results .result-item:hover {
+    background: #3a3a3a;
 }
 
 body.dark .favorite-btn, body.dark .customize-btn, body.dark .ai-btn {
