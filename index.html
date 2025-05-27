@@ -22,7 +22,7 @@
             </header>
             <div class="cover">
                 <img src="https://via.placeholder.com/300x400" alt="Couverture">
-                <button class="start-btn">Commencer la lecture</button>
+                <button class="start-btn" onclick="showIndexPage()">Commencer la lecture</button>
                 <p class="book-description">Découvrez une application élégante et intuitive pour explorer les 44 sourates du Coran, avec des fonctionnalités modernes comme la lecture à voix haute, la personnalisation, et la gestion des favoris. Parfait pour une expérience spirituelle enrichissante et accessible à tous.</p>
             </div>
         </div>
@@ -30,7 +30,7 @@
         <!-- Page Sommaire -->
         <div class="index-page" id="indexPage" style="display: none;">
             <header>
-                <button class="close-btn"><span>×</span></button>
+                <button class="close-btn" onclick="showHomePage()"><span>×</span></button>
                 <h1>Indexe sourates</h1>
             </header>
             <ul>
@@ -130,7 +130,7 @@
         <!-- Page Paramètres -->
         <div class="settings-panel" id="settingsPanel" style="display: none;">
             <header>
-                <button class="close-btn"><i class="fas fa-arrow-left"></i></button>
+                <button class="close-btn" onclick="showReadingPage()"><i class="fas fa-arrow-left"></i></button>
                 <h1>Paramètres</h1>
             </header>
             <div class="settings-content">
@@ -191,7 +191,7 @@
         <!-- Page Favoris -->
         <div class="favorites-page" id="favoritesPage" style="display: none;">
             <header>
-                <button class="close-btn"><i class="fas fa-arrow-left"></i></button>
+                <button class="close-btn" onclick="showReadingPage()"><i class="fas fa-arrow-left"></i></button>
                 <h1>Favoris</h1>
             </header>
             <ul id="favoritesList"></ul>
@@ -200,7 +200,7 @@
         <!-- Page Notes -->
         <div class="notes-page" id="notesPage" style="display: none;">
             <header>
-                <button class="close-btn"><i class="fas fa-arrow-left"></i></button>
+                <button class="close-btn" onclick="showReadingPage()"><i class="fas fa-arrow-left"></i></button>
                 <h1>Notes</h1>
             </header>
             <div class="notes-content">
@@ -210,7 +210,25 @@
             </div>
         </div>
     </div>
-    <script src="script.js"></script>
-    <script src="sura-content.js"></script>
+
+    <!-- Script pour gérer les redirections de base -->
+    <script>
+        function showIndexPage() {
+            document.getElementById('homePage').style.display = 'none';
+            document.getElementById('indexPage').style.display = 'block';
+        }
+
+        function showHomePage() {
+            document.getElementById('indexPage').style.display = 'none';
+            document.getElementById('homePage').style.display = 'block';
+        }
+
+        function showReadingPage() {
+            document.getElementById('settingsPanel').style.display = 'none';
+            document.getElementById('favoritesPage').style.display = 'none';
+            document.getElementById('notesPage').style.display = 'none';
+            document.getElementById('readingPage').style.display = 'block';
+        }
+    </script>
 </body>
 </html>
