@@ -17,12 +17,13 @@
         <!-- Page d'accueil -->
         <div class="home-page" id="homePage">
             <header>
-                <img src="https://via.placeholder.com/50" alt="Logo" class="logo">
+                <img src="logo.png" alt="Logo" class="logo">
                 <h1>Mon Livre</h1>
             </header>
             <div class="cover">
                 <img src="https://via.placeholder.com/300x400" alt="Couverture">
                 <button class="start-btn">Commencer la lecture</button>
+                <p class="book-description">Découvrez une application élégante et intuitive pour explorer les 44 sourates du Coran, avec des fonctionnalités modernes comme la lecture à voix haute, la personnalisation, et la gestion des favoris. Parfait pour une expérience spirituelle enrichissante et accessible à tous.</p>
             </div>
         </div>
 
@@ -83,10 +84,10 @@
         <!-- Page de lecture -->
         <div class="reading-page" id="readingPage" style="display: none;">
             <header>
-                <img src="https://via.placeholder.com/50" alt="Logo" class="logo">
+                <img src="logo.png" alt="Logo" class="logo">
                 <h1 id="suraTitle">Surat Al-Fatihah</h1>
                 <div class="header-icons">
-                    <button class="icon-btn favorites-btn"><i class="fas fa-star"></i></button>
+                    <button class="icon-btn favorites-btn">☆</button>
                     <button class="icon-btn settings-btn"><i class="fas fa-cog"></i></button>
                     <button class="icon-btn index-btn"><i class="fas fa-book-open"></i></button>
                 </div>
@@ -104,7 +105,7 @@
                     <button class="nav-btn prev-btn"><i class="fas fa-arrow-left"></i> Précédent</button>
                     <button class="nav-btn next-btn">Suivant <i class="fas fa-arrow-right"></i></button>
                 </div>
-                <button class="favorite-btn"><i class="fas fa-star"></i></button>
+                <button class="voice-play-btn"><i class="fas fa-play"></i> Lecture à haute voix</button>
                 <button class="customize-btn"><i class="fas fa-paint-brush"></i></button>
                 <button class="ai-btn"><i class="fas fa-robot"></i> Assistant</button>
             </div>
@@ -115,26 +116,13 @@
                     <button class="color-btn" style="background: #d2c9a3;" data-color="#d2c9a3"></button>
                     <button class="color-btn" style="background: #fff;" data-color="#fff"></button>
                     <button class="color-btn" style="background: #e0e0e0;" data-color="#e0e0e0"></button>
+                    <button class="color-btn" style="background: #ffff00;" data-color="#ffff00"></button>
                 </div>
                 <div class="option-icons">
-                    <button class="option-btn language-btn"><i class="fas fa-globe"></i> Changement de langue</button>
                     <button class="option-btn voice-play-btn"><i class="fas fa-play"></i> Lecture à haute voix</button>
-                    <button class="option-btn voice-select-btn"><i class="fas fa-user"></i> Choix de voix</button>
                     <button class="option-btn zoom-in-btn"><i class="fas fa-plus"></i> Zoom +</button>
                     <button class="option-btn zoom-out-btn"><i class="fas fa-minus"></i> Zoom -</button>
                     <button class="option-btn note-btn"><i class="fas fa-sticky-note"></i> Note</button>
-                </div>
-                <div class="voice-select-panel" id="voiceSelectPanel" style="display: none;">
-                    <button class="close-voice-btn"><i class="fas fa-times"></i></button>
-                    <select id="voiceSelect">
-                        <option value="voice1">Voix 1 - Ahmed</option>
-                        <option value="voice2">Voix 2 - Fatima</option>
-                        <option value="voice3">Voix 3 - Youssef</option>
-                        <option value="voice4">Voix 4 - Aisha</option>
-                        <option value="voice5">Voix 5 - Omar</option>
-                        <option value="voice6">Voix 6 - Khadija</option>
-                        <option value="voice7">Voix 7 - Ali</option>
-                    </select>
                 </div>
             </div>
         </div>
@@ -223,5 +211,6 @@
         </div>
     </div>
     <script src="script.js"></script>
+    <script src="sura-content.js"></script>
 </body>
 </html>
