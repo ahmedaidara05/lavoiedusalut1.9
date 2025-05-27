@@ -49,6 +49,7 @@ header h1 {
     color: white;
     font-size: 20px;
     margin: 0 15px; /* Ajusté pour alignement */
+    cursor: pointer;
 }
 
 .close-customize-btn, .close-voice-btn {
@@ -59,6 +60,7 @@ header h1 {
     position: absolute;
     top: 10px;
     right: 15px;
+    cursor: pointer;
 }
 
 .home-page {
@@ -81,6 +83,12 @@ header h1 {
     border-radius: 5px;
     margin-top: 20px;
     cursor: pointer;
+    font-size: 16px;
+    transition: background 0.3s ease;
+}
+
+.start-btn:hover {
+    background: #2a5c54;
 }
 
 .book-description {
@@ -215,6 +223,7 @@ header h1 {
     border: none;
     padding: 10px;
     border-radius: 5px;
+    cursor: pointer;
 }
 
 .customize-btn {
@@ -227,6 +236,7 @@ header h1 {
     border: none;
     padding: 10px;
     border-radius: 5px;
+    cursor: pointer;
 }
 
 .ai-btn {
@@ -238,6 +248,7 @@ header h1 {
     border: none;
     padding: 10px;
     border-radius: 5px;
+    cursor: pointer;
 }
 
 .customize-panel {
@@ -281,6 +292,7 @@ header h1 {
     display: flex;
     align-items: center;
     gap: 5px;
+    cursor: pointer;
 }
 
 .header-icons {
@@ -294,6 +306,7 @@ header h1 {
     border: none;
     color: white;
     font-size: 20px;
+    cursor: pointer;
 }
 
 .settings-panel {
@@ -329,6 +342,7 @@ header h1 {
     text-decoration: none;
     display: block;
     margin-bottom: 5px;
+    cursor: pointer;
 }
 
 .favorites-page {
@@ -381,6 +395,7 @@ header h1 {
     border: none;
     padding: 10px;
     border-radius: 5px;
+    cursor: pointer;
 }
 
 .category {
