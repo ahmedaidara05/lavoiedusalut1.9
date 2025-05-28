@@ -22,7 +22,7 @@
             </header>
             <div class="cover">
                 <img src="https://via.placeholder.com/300x400" alt="Couverture">
-                <button class="start-btn" onclick="showIndexPage()">Commencer la lecture</button>
+                <button class="start-btn">Commencer la lecture</button>
                 <p class="book-description">Découvrez une application élégante et intuitive pour explorer les 44 sourates du Coran, avec des fonctionnalités modernes comme la lecture à voix haute, la personnalisation, et la gestion des favoris. Parfait pour une expérience spirituelle enrichissante et accessible à tous.</p>
             </div>
         </div>
@@ -30,7 +30,7 @@
         <!-- Page Sommaire -->
         <div class="index-page" id="indexPage" style="display: none;">
             <header>
-                <button class="close-btn" onclick="showHomePage()"><span>×</span></button>
+                <button class="close-btn"><span>×</span></button>
                 <h1>Indexe sourates</h1>
             </header>
             <ul>
@@ -87,7 +87,7 @@
                 <img src="logo.png" alt="Logo" class="logo">
                 <h1 id="suraTitle">Surat Al-Fatihah</h1>
                 <div class="header-icons">
-                    <button class="icon-btn favorites-btn">☆</button>
+                    <button class="icon-btn favorites-btn"><i class="fas fa-star"></i></button>
                     <button class="icon-btn settings-btn"><i class="fas fa-cog"></i></button>
                     <button class="icon-btn index-btn"><i class="fas fa-book-open"></i></button>
                 </div>
@@ -105,24 +105,37 @@
                     <button class="nav-btn prev-btn"><i class="fas fa-arrow-left"></i> Précédent</button>
                     <button class="nav-btn next-btn">Suivant <i class="fas fa-arrow-right"></i></button>
                 </div>
-                <button class="voice-play-btn"><i class="fas fa-play"></i> Lecture à haute voix</button>
+                <button class="favorite-btn"><i class="fas fa-star"></i></button>
                 <button class="customize-btn"><i class="fas fa-paint-brush"></i></button>
                 <button class="ai-btn"><i class="fas fa-robot"></i> Assistant</button>
             </div>
             <div class="customize-panel" id="customizePanel" style="display: none;">
                 <button class="close-customize-btn"><i class="fas fa-times"></i></button>
                 <div class="color-icons">
-                    <button class="color-btn" style="background: #000;" data-color="#000"></button>
+                    <button class="color-btn" style="background: #bacdcf;" data-color="#bacdcf"></button>
                     <button class="color-btn" style="background: #d2c9a3;" data-color="#d2c9a3"></button>
-                    <button class="color-btn" style="background: #fff;" data-color="#fff"></button>
+                    <button class="color-btn" style="background: #bacdc1;" data-color="#bacdc1"></button>
                     <button class="color-btn" style="background: #e0e0e0;" data-color="#e0e0e0"></button>
-                    <button class="color-btn" style="background: #ffff00;" data-color="#ffff00"></button>
+                    <button class="color-btn" style="background: #d4af37;" data-color="#d4af37"></button> <!-- Nouvelle couleur jaune -->
                 </div>
                 <div class="option-icons">
                     <button class="option-btn voice-play-btn"><i class="fas fa-play"></i> Lecture à haute voix</button>
+                    <button class="option-btn voice-select-btn"><i class="fas fa-user"></i> Choix de voix</button>
                     <button class="option-btn zoom-in-btn"><i class="fas fa-plus"></i> Zoom +</button>
                     <button class="option-btn zoom-out-btn"><i class="fas fa-minus"></i> Zoom -</button>
                     <button class="option-btn note-btn"><i class="fas fa-sticky-note"></i> Note</button>
+                </div>
+                <div class="voice-select-panel" id="voiceSelectPanel" style="display: none;">
+                    <button class="close-voice-btn"><i class="fas fa-times"></i></button>
+                    <select id="voiceSelect">
+                        <option value="voice1">Voix 1 - Ahmed</option>
+                        <option value="voice2">Voix 2 - Fatima</option>
+                        <option value="voice3">Voix 3 - Youssef</option>
+                        <option value="voice4">Voix 4 - Aisha</option>
+                        <option value="voice5">Voix 5 - Omar</option>
+                        <option value="voice6">Voix 6 - Khadija</option>
+                        <option value="voice7">Voix 7 - Ali</option>
+                    </select>
                 </div>
             </div>
         </div>
@@ -130,7 +143,7 @@
         <!-- Page Paramètres -->
         <div class="settings-panel" id="settingsPanel" style="display: none;">
             <header>
-                <button class="close-btn" onclick="showReadingPage()"><i class="fas fa-arrow-left"></i></button>
+                <button class="close-btn"><i class="fas fa-arrow-left"></i></button>
                 <h1>Paramètres</h1>
             </header>
             <div class="settings-content">
@@ -191,7 +204,7 @@
         <!-- Page Favoris -->
         <div class="favorites-page" id="favoritesPage" style="display: none;">
             <header>
-                <button class="close-btn" onclick="showReadingPage()"><i class="fas fa-arrow-left"></i></button>
+                <button class="close-btn"><i class="fas fa-arrow-left"></i></button>
                 <h1>Favoris</h1>
             </header>
             <ul id="favoritesList"></ul>
@@ -200,7 +213,7 @@
         <!-- Page Notes -->
         <div class="notes-page" id="notesPage" style="display: none;">
             <header>
-                <button class="close-btn" onclick="showReadingPage()"><i class="fas fa-arrow-left"></i></button>
+                <button class="close-btn"><i class="fas fa-arrow-left"></i></button>
                 <h1>Notes</h1>
             </header>
             <div class="notes-content">
@@ -210,25 +223,6 @@
             </div>
         </div>
     </div>
-
-    <!-- Script pour gérer les redirections de base -->
-    <script>
-        function showIndexPage() {
-            document.getElementById('homePage').style.display = 'none';
-            document.getElementById('indexPage').style.display = 'block';
-        }
-
-        function showHomePage() {
-            document.getElementById('indexPage').style.display = 'none';
-            document.getElementById('homePage').style.display = 'block';
-        }
-
-        function showReadingPage() {
-            document.getElementById('settingsPanel').style.display = 'none';
-            document.getElementById('favoritesPage').style.display = 'none';
-            document.getElementById('notesPage').style.display = 'none';
-            document.getElementById('readingPage').style.display = 'block';
-        }
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
