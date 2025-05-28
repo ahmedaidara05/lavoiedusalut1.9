@@ -60,7 +60,6 @@ header h1 {
     position: absolute;
     top: 10px;
     right: 15px;
-    cursor: pointer;
 }
 
 .home-page {
@@ -83,16 +82,10 @@ header h1 {
     border-radius: 5px;
     margin-top: 20px;
     cursor: pointer;
-    font-size: 16px;
-    transition: background 0.3s ease;
-}
-
-.start-btn:hover {
-    background: #2a5c54;
 }
 
 .book-description {
-    font-size: 16px; /* Augmentation de la police */
+    font-size: 18px;
     color: #666;
     margin-top: 15px;
     line-height: 1.5;
@@ -145,7 +138,7 @@ header h1 {
     width: 90%;
     max-width: 500px;
     padding: 5px;
-    margin: 60px auto 20px;
+    margin: 60px auto 20px; /* Ajout d'une marge en bas */
     background: #1a3c34;
     color: white;
     border: none;
@@ -180,10 +173,10 @@ header h1 {
 }
 
 .content {
-    margin-top: 0;
+    margin-top: 0; /* Suppression de l'espace inutile */
     padding: 20px;
     height: 100%;
-    background: inherit;
+    background: inherit; /* Hérite de la couleur de fond choisie */
     position: relative;
 }
 
@@ -195,7 +188,7 @@ header h1 {
 }
 
 .arabic-text .bismillah, .text-content .bismillah {
-    font-size: 24px;
+    font-size: 24px; /* Taille augmentée pour "Au nom d'Allah..." */
     font-weight: bold;
 }
 
@@ -214,41 +207,28 @@ header h1 {
     cursor: pointer;
 }
 
-.voice-play-btn {
+.favorite-btn, .customize-btn, .ai-btn {
     position: fixed;
     bottom: 10px;
-    left: 10px;
     background: #1a3c34;
     color: white;
     border: none;
     padding: 10px;
     border-radius: 5px;
-    cursor: pointer;
+    margin: 0 10px;
+}
+
+.favorite-btn {
+    left: 10px;
 }
 
 .customize-btn {
-    position: fixed;
-    bottom: 10px;
     left: 50%;
     transform: translateX(-50%);
-    background: #1a3c34;
-    color: white;
-    border: none;
-    padding: 10px;
-    border-radius: 5px;
-    cursor: pointer;
 }
 
 .ai-btn {
-    position: fixed;
-    bottom: 10px;
     right: 10px;
-    background: #1a3c34;
-    color: white;
-    border: none;
-    padding: 10px;
-    border-radius: 5px;
-    cursor: pointer;
 }
 
 .customize-panel {
@@ -292,7 +272,23 @@ header h1 {
     display: flex;
     align-items: center;
     gap: 5px;
-    cursor: pointer;
+}
+
+.voice-select-panel {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: #f5f5f0;
+    padding: 15px;
+    border-top: 1px solid #d2c9a3;
+    display: none;
+    box-sizing: border-box;
+}
+
+.voice-select-panel select {
+    width: 100%;
+    padding: 5px;
 }
 
 .header-icons {
@@ -306,7 +302,6 @@ header h1 {
     border: none;
     color: white;
     font-size: 20px;
-    cursor: pointer;
 }
 
 .settings-panel {
@@ -342,7 +337,6 @@ header h1 {
     text-decoration: none;
     display: block;
     margin-bottom: 5px;
-    cursor: pointer;
 }
 
 .favorites-page {
@@ -395,7 +389,6 @@ header h1 {
     border: none;
     padding: 10px;
     border-radius: 5px;
-    cursor: pointer;
 }
 
 .category {
