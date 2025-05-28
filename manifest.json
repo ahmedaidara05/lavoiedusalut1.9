@@ -1,8 +1,21 @@
 {
-    "name": "Application Coran",
-    "short_name": "Coran",
-    "start_url": "/",
+    "name": "La Voie du Salut",
+    "short_name": "Voie du Salut",
+    "description": "Application de lecture spirituelle",
+    "start_url": "/index.html",
     "display": "standalone",
-    "background_color": "#f5f5f0",
-    "theme_color": "#1a3c34"
+    "background_color": "#F1F4F8",
+    "theme_color": "#14181B",
+    "icons": [
+        {
+            "src": "book-icon.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "book-icon.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
 }
