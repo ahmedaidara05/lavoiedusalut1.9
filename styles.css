@@ -17,23 +17,23 @@ body {
 }
 
 header {
-    background: #1a3c34; /* Couleur verte corrigée */
+    background: #2e7d32;
     color: white;
     display: flex;
     align-items: center;
-    padding: 10px 0; /* Padding ajusté pour toute la largeur */
+    padding: 10px 20px;
     position: fixed;
-    width: 100%; /* Assure la largeur complète */
+    width: 100%;
     top: 0;
     box-sizing: border-box;
     z-index: 1000;
-    left: 0; /* Corrige l'alignement gauche */
+    left: 0;
 }
 
 .logo {
     width: 30px;
     height: 30px;
-    margin-right: 0 15px; /* Plus d'espace pour éviter le découpage */
+    margin-right: 15px;
 }
 
 header h1 {
@@ -48,7 +48,7 @@ header h1 {
     border: none;
     color: white;
     font-size: 20px;
-    margin-right: 0 15px; /* Ajusté pour un meilleur espacement */
+    margin-right: 15px;
 }
 
 .close-customize-btn, .close-voice-btn {
@@ -58,7 +58,7 @@ header h1 {
     font-size: 20px;
     position: absolute;
     top: 10px;
-    right: 15px; /* Ajusté pour éviter le découpage */
+    right: 15px;
 }
 
 .home-page {
@@ -74,7 +74,7 @@ header h1 {
 }
 
 .start-btn {
-    background: #1a3c34;
+    background: #2e7d32;
     color: white;
     border: none;
     padding: 10px 20px;
@@ -83,16 +83,25 @@ header h1 {
     cursor: pointer;
 }
 
+.book-description {
+    font-size: 16px;
+    color: #666;
+    margin-top: 15px;
+    line-height: 1.5;
+}
+
 .index-page {
     padding: 60px 20px 20px;
-    height: 100vh;
+    height: calc(100vh - 80px);
     overflow-y: auto;
     background: #fff;
+    box-sizing: border-box;
 }
 
 .index-page ul {
     list-style: none;
     padding: 0;
+    margin: 0;
 }
 
 .index-page li {
@@ -113,7 +122,7 @@ header h1 {
     display: inline-block;
     width: 30px;
     height: 30px;
-    background: #1a3c34;
+    background: #2e7d32;
     color: white;
     border-radius: 50%;
     text-align: center;
@@ -127,16 +136,23 @@ header h1 {
 }
 
 .search-bar {
-    width: 90%; /* Ajusté pour éviter le découpage */
-    max-width: 500px; /* Largeur maximale pour centrer */
+    width: 90%;
+    max-width: 500px;
     padding: 5px;
-    margin: 60px auto 10px; /* Centré avec margin auto */
-    background: #1a3c34;
+    margin: 60px auto 20px;
+    background: #2e7d32;
     color: white;
     border: none;
     border-radius: 5px;
     display: block;
     text-align: center;
+}
+
+/* Ajustement pour les écrans plus petits (téléphones) */
+@media (max-width: 600px) {
+    .search-bar {
+        margin-top: 70px;
+    }
 }
 
 .search-results {
@@ -165,18 +181,24 @@ header h1 {
 }
 
 .content {
-    margin-top: 110px; /* Ajusté pour laisser de la place à la barre de recherche */
+    margin-top: 0;
     padding: 20px;
-    height: calc(100vh - 110px);
-    background: #fff;
+    height: calc(100vh - 120px);
+    background: inherit;
     position: relative;
+    overflow-y: auto;
 }
 
 .arabic-text, .text-content {
     font-size: 16px;
     line-height: 1.6;
     color: #1a3c34;
-    margin-bottom: 60px;
+    margin-bottom: 20px;
+}
+
+.arabic-text .bismillah, .text-content .bismillah {
+    font-size: 24px;
+    font-weight: bold;
 }
 
 .navigation-buttons {
@@ -186,7 +208,7 @@ header h1 {
 }
 
 .nav-btn {
-    background: #1a3c34;
+    background: #2e7d32;
     color: white;
     border: none;
     padding: 10px 20px;
@@ -197,7 +219,7 @@ header h1 {
 .favorite-btn, .customize-btn, .ai-btn {
     position: fixed;
     bottom: 10px;
-    background: #1a3c34;
+    background: #2e7d32;
     color: white;
     border: none;
     padding: 10px;
@@ -224,7 +246,7 @@ header h1 {
     left: 0;
     width: 100%;
     background: #f5f5f0;
-    padding: 15px; /* Ajusté pour un meilleur espacement */
+    padding: 15px;
     border-top: 1px solid #d2c9a3;
     display: none;
     flex-direction: column;
@@ -261,27 +283,10 @@ header h1 {
     gap: 5px;
 }
 
-.voice-select-panel {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    background: #f5f5f0;
-    padding: 15px; /* Ajusté pour un meilleur espacement */
-    border-top: 1px solid #d2c9a3;
-    display: none;
-    box-sizing: border-box;
-}
-
-.voice-select-panel select {
-    width: 100%;
-    padding: 5px;
-}
-
 .header-icons {
     display: flex;
-    gap: 15px; /* Plus d'espace entre les icônes */
-    margin-left: 15px; /* Ajusté pour éviter le découpage */
+    gap: 15px;
+    margin-left: 15px;
 }
 
 .icon-btn {
@@ -293,29 +298,47 @@ header h1 {
 
 .settings-panel {
     padding: 60px 20px 20px;
-    height: 100vh;
+    height: calc(100vh - 80px);
     overflow-y: auto;
     background: #f5f5f0;
+    box-sizing: border-box;
+}
+
+.settings-content {
+    max-width: 400px; /* Limite la largeur pour un centrage élégant */
+    margin: 0 auto; /* Centre le contenu horizontalement */
+    padding: 20px; /* Ajoute un padding interne pour l'espace avec les bordures */
+    border-radius: 10px; /* Coins arrondis pour un look moderne */
+    background: #ffffff; /* Fond blanc pour contraste avec le fond principal */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Ombre légère pour un effet moderne */
 }
 
 .setting {
-    margin-bottom: 15px;
+    margin-bottom: 20px; /* Espacement entre chaque groupe de paramètres */
+    padding: 10px; /* Padding interne pour chaque setting */
+    border-bottom: 1px solid #d2c9a3; /* Ligne fine pour séparer les sections */
 }
 
 .setting label {
     display: block;
     margin-bottom: 5px;
+    font-weight: 600; /* Texte plus bold pour un look moderne */
+    color: #1a3c34;
 }
 
 .setting input, .setting select {
     width: 100%;
-    padding: 5px;
+    padding: 8px; /* Padding plus généreux pour un aspect élégant */
     margin-bottom: 5px;
+    border: 1px solid #d2c9a3;
+    border-radius: 5px; /* Coins arrondis pour les inputs */
+    box-sizing: border-box;
+    font-size: 14px;
 }
 
 .auth-btn, .link-btn {
     width: 100%;
-    background: #1a3c34;
+    background: #2e7d32;
     color: white;
     border: none;
     padding: 10px;
@@ -323,19 +346,26 @@ header h1 {
     text-align: center;
     text-decoration: none;
     display: block;
-    margin-bottom: 5px;
+    margin-bottom: 10px;
+    transition: background 0.3s ease; /* Animation au survol */
+}
+
+.auth-btn:hover, .link-btn:hover {
+    background: #1f5c24; /* Légère variation de couleur au survol */
 }
 
 .favorites-page {
     padding: 60px 20px 20px;
-    height: 100vh;
+    height: calc(100vh - 80px);
     overflow-y: auto;
     background: #fff;
+    box-sizing: border-box;
 }
 
 #favoritesList {
     list-style: none;
     padding: 0;
+    margin: 0;
 }
 
 #favoritesList li {
@@ -354,13 +384,15 @@ header h1 {
 
 .notes-page {
     padding: 60px 20px 20px;
-    height: 100vh;
+    height: calc(100vh - 80px);
     overflow-y: auto;
     background: #f5f5f0;
+    box-sizing: border-box;
 }
 
 .notes-content {
     padding: 20px;
+    padding-bottom: 20px;
 }
 
 #newCategory {
@@ -371,7 +403,7 @@ header h1 {
 
 .add-category-btn {
     width: 100%;
-    background: #1a3c34;
+    background: #2e7d32;
     color: white;
     border: none;
     padding: 10px;
@@ -403,7 +435,7 @@ body.dark {
 }
 
 body.dark .content {
-    background: #2a2a2a;
+    background: inherit;
 }
 
 body.dark .index-page {
@@ -428,11 +460,11 @@ body.dark .search-results .result-item:hover {
 }
 
 body.dark .favorite-btn, body.dark .customize-btn, body.dark .ai-btn {
-    background: #333;
+    background: #2e7d32;
 }
 
 body.dark .start-btn {
-    background: #333;
+    background: #2e7d32;
 }
 
 @media print {
