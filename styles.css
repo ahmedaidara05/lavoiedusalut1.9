@@ -17,21 +17,23 @@ body {
 }
 
 header {
-    background: #1a3c34;
+    background: #1a3c34; /* Couleur verte corrigée */
     color: white;
     display: flex;
     align-items: center;
-    padding: 10px 20px; /* Ajusté pour éviter le découpage */
+    padding: 10px 0; /* Padding ajusté pour toute la largeur */
     position: fixed;
-    width: 100%;
+    width: 100%; /* Assure la largeur complète */
     top: 0;
     box-sizing: border-box;
+    z-index: 1000;
+    left: 0; /* Corrige l'alignement gauche */
 }
 
 .logo {
     width: 30px;
     height: 30px;
-    margin-right: 15px; /* Plus d'espace pour éviter le découpage */
+    margin-right: 0 15px; /* Plus d'espace pour éviter le découpage */
 }
 
 header h1 {
@@ -46,7 +48,7 @@ header h1 {
     border: none;
     color: white;
     font-size: 20px;
-    margin-right: 15px; /* Ajusté pour un meilleur espacement */
+    margin-right: 0 15px; /* Ajusté pour un meilleur espacement */
 }
 
 .close-customize-btn, .close-voice-btn {
