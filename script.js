@@ -1,3 +1,19 @@
+// Configuration et initialisation de Firebase
+const firebaseConfig = {
+    apiKey: "AIzaSyAljojXHODwHjStePWkhthWLRzrw3pUslQ",
+    authDomain: "la-voie-du-salut-36409.firebaseapp.com",
+    projectId: "la-voie-du-salut-36409",
+    storageBucket: "la-voie-du-salut-36409.firebasestorage.app",
+    messagingSenderId: "61439310820",
+    appId: "1:61439310820:web:52bfe8b862666ac13d25f1",
+    measurementId: "G-G9S1ST8K3R"
+};
+
+// Initialiser Firebase
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js').then(() => {
         console.log('Service Worker registered');
@@ -20,6 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const fontSize = document.getElementById('fontSize');
     const favoritesList = document.getElementById('favoritesList');
     const searchBar = document.getElementById('searchBar');
+    const searchResults = document.getElementById('searchResults');
     const customizePanel = document.getElementById('customizePanel');
     const voiceSelectPanel = document.getElementById('voiceSelectPanel');
     const voiceSelect = document.getElementById('voiceSelect');
@@ -29,6 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentSura = 1;
     let isPlaying = false;
     let synth = window.speechSynthesis;
+    let currentFontSize = 16;
 
     // Contenu des 44 sourates en arabe, anglais et français
     const suraContents = {
@@ -209,7 +227,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Changement de langue
     document.querySelector('.language-btn').addEventListener('click', () => {
-        languageSelect.focus();
+        const lang = prompt('Choisissez une langue (fr/en/ar):', languageSelect.value);
+        if (lang && ['fr', 'en', 'ar'].includes(lang)) {
+            languageSelect.value = lang;
+            updateContent();
+        }
+    });
+
+    // Zoom
+    document.querySelector('.zoom-in-btn').addEventListener('click', () => {
+        currentFontSize = Math.min(currentFontSize + 2, 30);
+        arabicText.style.fontSize = `${currentFontSize}px`;
+        textContent.style.fontSize = `${currentFontSize}px`;
+    });
+
+    document.querySelector('.zoom-out-btn').addEventListener('click', () => {
+        currentFontSize = Math.max(currentFontSize - 2, 12);
+        arabicText.style.fontSize = `${currentFontSize}px`;
+        textContent.style.fontSize = `${currentFontSize}px`;
     });
 
     // Lecture à haute voix
@@ -231,8 +266,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (textToRead) {
                 const utterance = new SpeechSynthesisUtterance(textToRead);
                 const voices = synth.getVoices();
-                const selectedVoice = voiceSelect.value.split('-')[0];
-                utterance.voice = voices.find(voice => voice.name.includes(selectedVoice)) || voices[0];
+                const selectedVoiceName = voiceSelect.value.split('-')[0];
+                utterance.voice = voices.find(voice => voice.name.toLowerCase().includes(selectedVoiceName.toLowerCase())) || voices[0];
+                utterance.lang = languageSelect.value === 'ar' ? 'ar-SA' : (languageSelect.value === 'en' ? 'en-US' : 'fr-FR');
                 synth.speak(utterance);
                 isPlaying = true;
                 voicePlayBtn.innerHTML = '<i class="fas fa-pause"></i> Lecture à haute voix';
@@ -286,19 +322,61 @@ document.addEventListener('DOMContentLoaded', () => {
         alert('Assistant IA : Posez une question sur le livre (API Gemini à intégrer)');
     });
 
-    // Recherche
+    // Recherche intelligente
     searchBar.addEventListener('input', (e) => {
-        const searchTerm = e.target.value.toLowerCase();
-        const content = languageSelect.value === 'ar' ? arabicText.innerHTML : textContent.innerHTML;
-        const words = content.split(/<br>/).join(' ').split(' ');
-        const matches = [];
-        words.forEach((word, index) => {
-            if (word.toLowerCase().includes(searchTerm)) {
-                matches.push({ word, index });
+        const searchTerm = e.target.value.trim().toLowerCase();
+        searchResults.style.display = searchTerm ? 'block' : 'none';
+        searchResults.innerHTML = '';
+
+        if (searchTerm) {
+            const allText = {};
+            for (let sura = 1; sura <= 44; sura++) {
+                ['ar', 'en', 'fr'].forEach(lang => {
+                    if (suraContents[sura] && suraContents[sura][lang]) {
+                        const lines = suraContents[sura][lang].split('<br>');
+                        lines.forEach((line, index) => {
+                            if (line.toLowerCase().includes(searchTerm)) {
+                                if (!allText[sura]) allText[sura] = {};
+                                if (!allText[sura][lang]) allText[sura][lang] = [];
+                                allText[sura][lang].push({ text: line, lineIndex: index });
+                            }
+                        });
+                    }
+                });
             }
-        });
-        if (matches.length > 0) {
-            alert(`Occurrences trouvées : ${matches.length}. Cliquez pour naviguer.`);
+
+            for (let sura in allText) {
+                for (let lang in allText[sura]) {
+                    allText[sura][lang].forEach(result => {
+                        const div = document.createElement('div');
+                        div.className = 'result-item';
+                        div.innerHTML = `<strong>Surat ${sura} (${lang.toUpperCase()})</strong><br>${result.text}`;
+                        div.addEventListener('click', () => {
+                            currentSura = parseInt(sura);
+                            languageSelect.value = lang;
+                            updateContent();
+                            const lines = suraContents[currentSura][lang].split('<br>');
+                            arabicText.innerHTML = suraContents[currentSura][lang];
+                            textContent.innerHTML = suraContents[currentSura][lang];
+                            if (lang === 'ar') {
+                                arabicText.style.display = 'block';
+                                textContent.style.display = 'none';
+                            } else {
+                                arabicText.style.display = 'none';
+                                textContent.style.display = 'block';
+                            }
+                            const targetElement = lang === 'ar' ? arabicText : textContent;
+                            const targetLines = targetElement.innerHTML.split('<br>');
+                            targetLines[result.lineIndex] = `<span style="background: yellow">${targetLines[result.lineIndex]}</span>`;
+                            targetElement.innerHTML = targetLines.join('<br>');
+                            targetElement.scrollTop = targetElement.scrollHeight * (result.lineIndex / targetLines.length);
+                            searchResults.style.display = 'none';
+                            searchBar.value = '';
+                        });
+                        searchResults.appendChild(div);
+                    });
+                }
+            }
         }
     });
 
@@ -308,9 +386,21 @@ document.addEventListener('DOMContentLoaded', () => {
             const username = btn.parentElement.querySelector('input[type="text"]').value;
             const password = btn.parentElement.querySelector('input[type="password"]').value;
             if (btn.textContent === 'Se connecter') {
-                alert(`Connexion avec ${username}`);
+                auth.signInWithEmailAndPassword(username, password)
+                    .then((userCredential) => {
+                        alert(`Connexion réussie avec ${username}`);
+                    })
+                    .catch((error) => {
+                        alert('Erreur de connexion : ' + error.message);
+                    });
             } else {
-                alert(`Inscription de ${username}`);
+                auth.createUserWithEmailAndPassword(username, password)
+                    .then((userCredential) => {
+                        alert(`Inscription réussie pour ${username}`);
+                    })
+                    .catch((error) => {
+                        alert('Erreur d\'inscription : ' + error.message);
+                    });
             }
         });
     });
