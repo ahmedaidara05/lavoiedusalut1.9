@@ -38,9 +38,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const searchBar = document.getElementById('searchBar');
     const searchResults = document.getElementById('searchResults');
     const customizePanel = document.getElementById('customizePanel');
-    const voiceSelectPanel = document.getElementById('voiceSelectPanel');
-    const voiceSelect = document.getElementById('voiceSelect');
-    const voicePlayBtn = document.querySelector('.voice-play-btn');
+    const favoriteBtn = document.querySelector('.favorite-btn');
+    const voicePlayBtn = document.querySelector('.customize-panel .voice-play-btn'); // Mis à jour pour le panneau de personnalisation
     let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
     let notes = JSON.parse(localStorage.getItem('notes')) || {};
     let currentSura = 1;
@@ -178,12 +177,16 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Favoris
-    document.querySelector('.favorite-btn').addEventListener('click', () => {
-        if (!favorites.includes(currentSura) && currentSura >= 1 && currentSura <= 44) {
+    favoriteBtn.addEventListener('click', () => {
+        if (!favorites.includes(currentSura)) {
             favorites.push(currentSura);
-            localStorage.setItem('favorites', JSON.stringify(favorites));
-            updateFavorites();
+            favoriteBtn.textContent = '★';
+        } else {
+            favorites = favorites.filter(sura => sura !== currentSura);
+            favoriteBtn.textContent = '☆';
         }
+        localStorage.setItem('favorites', JSON.stringify(favorites));
+        updateFavorites();
     });
 
     document.querySelector('.favorites-btn').addEventListener('click', () => {
@@ -197,7 +200,7 @@ document.addEventListener('DOMContentLoaded', () => {
         favorites.forEach(sura => {
             if (sura >= 1 && sura <= 44 && suraContents[sura]) {
                 const li = document.createElement('li');
-                li.innerHTML = `<span class="sura-number">${sura}</span> Surat ${sura}<br>Nombre aya ${suraContents[sura].ar.split('<br>').length - 1} <i class="fas fa-mosque"></i>`;
+                li.innerHTML = `<span class="sura-number">${sura}</span> La Voie du Salut ${sura}<br>Nombre aya ${suraContents[sura].ar.split('<br>').length - 1} <i class="fas fa-mosque"></i>`;
                 li.addEventListener('click', () => {
                     currentSura = sura;
                     updateContent();
@@ -221,17 +224,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.querySelectorAll('.color-btn').forEach(btn => {
         btn.addEventListener('click', () => {
-            document.getElementById('readingContent').style.backgroundColor = btn.getAttribute('data-color');
+            const content = document.getElementById('readingContent');
+            const color = btn.getAttribute('data-color');
+            content.style.backgroundColor = color;
+            document.body.style.backgroundColor = color;
         });
-    });
-
-    // Changement de langue
-    document.querySelector('.language-btn').addEventListener('click', () => {
-        const lang = prompt('Choisissez une langue (fr/en/ar):', languageSelect.value);
-        if (lang && ['fr', 'en', 'ar'].includes(lang)) {
-            languageSelect.value = lang;
-            updateContent();
-        }
     });
 
     // Zoom
@@ -247,15 +244,7 @@ document.addEventListener('DOMContentLoaded', () => {
         textContent.style.fontSize = `${currentFontSize}px`;
     });
 
-    // Lecture à haute voix
-    document.querySelector('.voice-select-btn').addEventListener('click', () => {
-        voiceSelectPanel.style.display = voiceSelectPanel.style.display === 'none' ? 'block' : 'none';
-    });
-
-    document.querySelector('.close-voice-btn').addEventListener('click', () => {
-        voiceSelectPanel.style.display = 'none';
-    });
-
+    // Lecture à haute voix (maintenant dans le panneau de personnalisation)
     voicePlayBtn.addEventListener('click', () => {
         if (isPlaying) {
             synth.cancel();
@@ -265,9 +254,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const textToRead = languageSelect.value === 'ar' ? arabicText.innerText : textContent.innerText;
             if (textToRead) {
                 const utterance = new SpeechSynthesisUtterance(textToRead);
-                const voices = synth.getVoices();
-                const selectedVoiceName = voiceSelect.value.split('-')[0];
-                utterance.voice = voices.find(voice => voice.name.toLowerCase().includes(selectedVoiceName.toLowerCase())) || voices[0];
                 utterance.lang = languageSelect.value === 'ar' ? 'ar-SA' : (languageSelect.value === 'en' ? 'en-US' : 'fr-FR');
                 synth.speak(utterance);
                 isPlaying = true;
@@ -350,7 +336,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     allText[sura][lang].forEach(result => {
                         const div = document.createElement('div');
                         div.className = 'result-item';
-                        div.innerHTML = `<strong>Surat ${sura} (${lang.toUpperCase()})</strong><br>${result.text}`;
+                        div.innerHTML = `<strong>La Voie du Salut ${sura} (${lang.toUpperCase()})</strong><br>${result.text}`;
                         div.addEventListener('click', () => {
                             currentSura = parseInt(sura);
                             languageSelect.value = lang;
@@ -407,17 +393,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function updateContent() {
         const content = suraContents[currentSura] && suraContents[currentSura][languageSelect.value];
-        suraTitle.textContent = `Surat ${currentSura}`;
+        suraTitle.textContent = `La Voie du Salut ${currentSura}`;
         if (content) {
+            const lines = content.split('<br>');
+            const bismillahLine = lines[0];
+            const rest = lines.slice(1).join('<br>');
             if (languageSelect.value === 'ar') {
-                arabicText.innerHTML = content;
+                arabicText.innerHTML = `<span class="bismillah">${bismillahLine}</span><br>${rest}`;
                 textContent.style.display = 'none';
                 arabicText.style.display = 'block';
             } else {
-                textContent.innerHTML = content;
+                textContent.innerHTML = `<span class="bismillah">${bismillahLine}</span><br>${rest}`;
                 arabicText.style.display = 'none';
                 textContent.style.display = 'block';
             }
+            // Mettre à jour l'état de l'étoile des favoris
+            favoriteBtn.textContent = favorites.includes(currentSura) ? '★' : '☆';
         } else {
             arabicText.innerHTML = 'Contenu non disponible';
             textContent.innerHTML = 'Content not available';
@@ -425,6 +416,9 @@ document.addEventListener('DOMContentLoaded', () => {
             textContent.style.display = 'none';
         }
     }
+
+    // Initialisation
+    updateContent();
 
     // Sécurité
     document.addEventListener('keydown', (e) => {
