@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Traitement du paiement</title>
+    <style>
+        body {
+            font-family: 'Amiri', serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: #f5f5f0;
+            color: #1a3c34;
+        }
+        .loader {
+            text-align: center;
+        }
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #2e7d32;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="loader">
+        <div class="spinner"></div>
+        <p>Redirection vers PayTech...</p>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = 'https://paytech.sn/api/payment/request-payment';
+
+            const apiKey = '938bf9376e598034d121537116e92108b07ea12438d445ef013b1b7995a17019';
+            const apiSecret = 'e3018566d75fcaead29539bc8bee247ec167ee4ca3a8de4e197f2cd46acb8c44';
+            const amount = 2000;
+            const currency = 'XOF';
+            const refCommand = `ORDER_${Date.now()}`; // Utilisation explicite de ref_command
+            const ipnUrl = 'https://hooks.zapier.com/hooks/catch/22966712/2vofva2/';
+            const successUrl = 'https://ahmedaidara05.github.io/lavoiedusalut1.0/index.html?payment=success';
+            const cancelUrl = 'https://ahmedaidara05.github.io/lavoiedusalut1.0/index.html?payment=cancel';
+
+            const fields = {
+                api_key: apiKey,
+                api_secret: apiSecret,
+                amount: amount,
+                currency: currency,
+                ref_command: refCommand, // Remplacement de 'reference' par 'ref_command'
+                ipn_url: ipnUrl,
+                success_url: successUrl,
+                cancel_url: cancelUrl,
+                item_name: 'La Voie du Salut - Accès Complet',
+                item_price: amount,
+                description: 'Achat de l\'accès complet au livre La Voie du Salut (chapitres 8 à 44)',
+                customer_email: 'client@example.com', // Remplacez par l'email de l'utilisateur si possible
+                customer_phone: '1234567890' // Remplacez par le numéro de l'utilisateur si possible
+            };
+
+            for (const [key, value] of Object.entries(fields)) {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = key;
+                input.value = value;
+                form.appendChild(input);
+            }
+
+            document.body.appendChild(form);
+            form.submit(); // Soumission immédiate du formulaire
+        });
+    </script>
+</body>
+</html>
