@@ -305,33 +305,33 @@ header h1 {
 }
 
 .settings-content {
-    max-width: 400px; /* Limite la largeur pour un centrage élégant */
-    margin: 0 auto; /* Centre le contenu horizontalement */
-    padding: 20px; /* Ajoute un padding interne pour l'espace avec les bordures */
-    border-radius: 10px; /* Coins arrondis pour un look moderne */
-    background: #ffffff; /* Fond blanc pour contraste avec le fond principal */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Ombre légère pour un effet moderne */
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 20px;
+    border-radius: 10px;
+    background: #ffffff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .setting {
-    margin-bottom: 20px; /* Espacement entre chaque groupe de paramètres */
-    padding: 10px; /* Padding interne pour chaque setting */
-    border-bottom: 1px solid #d2c9a3; /* Ligne fine pour séparer les sections */
+    margin-bottom: 20px;
+    padding: 10px;
+    border-bottom: 1px solid #d2c9a3;
 }
 
 .setting label {
     display: block;
     margin-bottom: 5px;
-    font-weight: 600; /* Texte plus bold pour un look moderne */
+    font-weight: 600;
     color: #1a3c34;
 }
 
 .setting input, .setting select {
     width: 100%;
-    padding: 8px; /* Padding plus généreux pour un aspect élégant */
+    padding: 8px;
     margin-bottom: 5px;
     border: 1px solid #d2c9a3;
-    border-radius: 5px; /* Coins arrondis pour les inputs */
+    border-radius: 5px;
     box-sizing: border-box;
     font-size: 14px;
 }
@@ -347,11 +347,11 @@ header h1 {
     text-decoration: none;
     display: block;
     margin-bottom: 10px;
-    transition: background 0.3s ease; /* Animation au survol */
+    transition: background 0.3s ease;
 }
 
 .auth-btn:hover, .link-btn:hover {
-    background: #1f5c24; /* Légère variation de couleur au survol */
+    background: #1f5c24;
 }
 
 .favorites-page {
@@ -465,6 +465,91 @@ body.dark .favorite-btn, body.dark .customize-btn, body.dark .ai-btn {
 
 body.dark .start-btn {
     background: #2e7d32;
+}
+
+/* Styles pour la modale de paiement */
+.payment-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5); /* Fond semi-transparent */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+.payment-modal-content {
+    position: relative;
+    background: #ffffff;
+    max-width: 400px;
+    width: 90%;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    animation: slideIn 0.3s ease-out; /* Animation d'apparition */
+}
+
+.close-modal-btn {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: none;
+    border: none;
+    font-size: 20px;
+    color: #1a3c34;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.close-modal-btn:hover {
+    color: #2e7d32;
+}
+
+.payment-modal-content h2 {
+    font-size: 24px;
+    color: #1a3c34;
+    margin-bottom: 15px;
+}
+
+.payment-modal-content p {
+    font-size: 16px;
+    color: #666;
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+
+.buy-btn {
+    background: #2e7d32;
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 25px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.buy-btn:hover {
+    background: #1f5c24;
+    transform: scale(1.05); /* Légère animation au survol */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 @media print {
