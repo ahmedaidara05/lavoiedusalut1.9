@@ -39,13 +39,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const searchResults = document.getElementById('searchResults');
     const customizePanel = document.getElementById('customizePanel');
     const favoriteBtn = document.querySelector('.favorite-btn');
-    const voicePlayBtn = document.querySelector('.customize-panel .voice-play-btn'); // Mis à jour pour le panneau de personnalisation
+    const voicePlayBtn = document.querySelector('.customize-panel .voice-play-btn');
+    const paymentModal = document.getElementById('paymentModal');
+    const closeModalBtn = document.querySelector('.close-modal-btn');
+    const buyBtn = document.querySelector('.buy-btn');
     let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
     let notes = JSON.parse(localStorage.getItem('notes')) || {};
     let currentSura = 1;
     let isPlaying = false;
     let synth = window.speechSynthesis;
     let currentFontSize = 16;
+    let hasPurchased = localStorage.getItem('hasPurchased') === 'true'; // Vérifie si l'utilisateur a déjà payé
 
     // Contenu des 44 sourates en arabe, anglais et français
     const suraContents = {
@@ -103,10 +107,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.querySelectorAll('.index-page li').forEach(li => {
         li.addEventListener('click', () => {
-            currentSura = parseInt(li.getAttribute('data-sura'));
-            updateContent();
-            indexPage.style.display = 'none';
-            readingPage.style.display = 'block';
+            const sura = parseInt(li.getAttribute('data-sura'));
+            if (sura <= 7 || hasPurchased) {
+                currentSura = sura;
+                updateContent();
+                indexPage.style.display = 'none';
+                readingPage.style.display = 'block';
+            } else {
+                paymentModal.style.display = 'flex';
+            }
         });
     });
 
@@ -141,14 +150,24 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelector('.prev-btn').addEventListener('click', () => {
         if (currentSura > 1) {
             currentSura--;
-            updateContent();
+            if (currentSura >= 8 && !hasPurchased) {
+                paymentModal.style.display = 'flex';
+                currentSura++;
+            } else {
+                updateContent();
+            }
         }
     });
 
     document.querySelector('.next-btn').addEventListener('click', () => {
         if (currentSura < 44) {
             currentSura++;
-            updateContent();
+            if (currentSura >= 8 && !hasPurchased) {
+                paymentModal.style.display = 'flex';
+                currentSura--;
+            } else {
+                updateContent();
+            }
         }
     });
 
@@ -202,10 +221,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 const li = document.createElement('li');
                 li.innerHTML = `<span class="sura-number">${sura}</span> La Voie du Salut ${sura}<br>Nombre aya ${suraContents[sura].ar.split('<br>').length - 1} <i class="fas fa-mosque"></i>`;
                 li.addEventListener('click', () => {
-                    currentSura = sura;
-                    updateContent();
-                    favoritesPage.style.display = 'none';
-                    readingPage.style.display = 'block';
+                    if (sura <= 7 || hasPurchased) {
+                        currentSura = sura;
+                        updateContent();
+                        favoritesPage.style.display = 'none';
+                        readingPage.style.display = 'block';
+                    } else {
+                        paymentModal.style.display = 'flex';
+                    }
                 });
                 favoritesList.appendChild(li);
             }
@@ -244,7 +267,7 @@ document.addEventListener('DOMContentLoaded', () => {
         textContent.style.fontSize = `${currentFontSize}px`;
     });
 
-    // Lecture à haute voix (maintenant dans le panneau de personnalisation)
+    // Lecture à haute voix
     voicePlayBtn.addEventListener('click', () => {
         if (isPlaying) {
             synth.cancel();
@@ -338,26 +361,30 @@ document.addEventListener('DOMContentLoaded', () => {
                         div.className = 'result-item';
                         div.innerHTML = `<strong>La Voie du Salut ${sura} (${lang.toUpperCase()})</strong><br>${result.text}`;
                         div.addEventListener('click', () => {
-                            currentSura = parseInt(sura);
-                            languageSelect.value = lang;
-                            updateContent();
-                            const lines = suraContents[currentSura][lang].split('<br>');
-                            arabicText.innerHTML = suraContents[currentSura][lang];
-                            textContent.innerHTML = suraContents[currentSura][lang];
-                            if (lang === 'ar') {
-                                arabicText.style.display = 'block';
-                                textContent.style.display = 'none';
+                            if (sura <= 7 || hasPurchased) {
+                                currentSura = parseInt(sura);
+                                languageSelect.value = lang;
+                                updateContent();
+                                const lines = suraContents[currentSura][lang].split('<br>');
+                                arabicText.innerHTML = suraContents[currentSura][lang];
+                                textContent.innerHTML = suraContents[currentSura][lang];
+                                if (lang === 'ar') {
+                                    arabicText.style.display = 'block';
+                                    textContent.style.display = 'none';
+                                } else {
+                                    arabicText.style.display = 'none';
+                                    textContent.style.display = 'block';
+                                }
+                                const targetElement = lang === 'ar' ? arabicText : textContent;
+                                const targetLines = targetElement.innerHTML.split('<br>');
+                                targetLines[result.lineIndex] = `<span style="background: yellow">${targetLines[result.lineIndex]}</span>`;
+                                targetElement.innerHTML = targetLines.join('<br>');
+                                targetElement.scrollTop = targetElement.scrollHeight * (result.lineIndex / targetLines.length);
+                                searchResults.style.display = 'none';
+                                searchBar.value = '';
                             } else {
-                                arabicText.style.display = 'none';
-                                textContent.style.display = 'block';
+                                paymentModal.style.display = 'flex';
                             }
-                            const targetElement = lang === 'ar' ? arabicText : textContent;
-                            const targetLines = targetElement.innerHTML.split('<br>');
-                            targetLines[result.lineIndex] = `<span style="background: yellow">${targetLines[result.lineIndex]}</span>`;
-                            targetElement.innerHTML = targetLines.join('<br>');
-                            targetElement.scrollTop = targetElement.scrollHeight * (result.lineIndex / targetLines.length);
-                            searchResults.style.display = 'none';
-                            searchBar.value = '';
                         });
                         searchResults.appendChild(div);
                     });
@@ -390,6 +417,28 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
+
+    // Gestion de la modale de paiement
+    closeModalBtn.addEventListener('click', () => {
+        paymentModal.style.display = 'none';
+    });
+
+    buyBtn.addEventListener('click', () => {
+        // Redirection vers payment.html pour initier le paiement
+        window.location.href = 'payment.html';
+    });
+
+    // Vérification après redirection de succès (depuis payment.html)
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('payment') === 'success') {
+        hasPurchased = true;
+        localStorage.setItem('hasPurchased', 'true');
+        alert('Paiement réussi ! Accès complet débloqué.');
+        window.location.href = 'index.html'; // Retour à la page principale
+    } else if (urlParams.get('payment') === 'cancel') {
+        alert('Paiement annulé. Vous pouvez réessayer.');
+        window.location.href = 'index.html'; // Retour à la page principale
+    }
 
     function updateContent() {
         const content = suraContents[currentSura] && suraContents[currentSura][languageSelect.value];
